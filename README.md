@@ -15,6 +15,10 @@ ani nic instalować przez `pip`/`npm` — wystarczy Python 3.9+.
 > Ten projekt nie jest oficjalnie powiązany z żadną z wymienionych baz danych
 > ani z Anthropic. To niezależny, otwarty port publicznych API/zasobów.
 
+To repo jest też **Claude Code Plugin Marketplace** (`.claude-plugin/marketplace.json`)
+— najszybszy sposób na instalację to `claude plugin marketplace add
+asterixix/polish-academic-skills`, patrz [Instalacja](#instalacja).
+
 ---
 
 ## Dostępne skille
@@ -52,11 +56,43 @@ dla tych, które byłyby zbyt długie w `SKILL.md`).
 
 ## Instalacja
 
+### Claude Code — przez Plugin Marketplace (zalecane)
+
+To repo jest jednocześnie **marketplace pluginów** Claude Code
+(`.claude-plugin/marketplace.json`). Każdy skill jest osobnym pluginem, więc
+możesz zainstalować tylko te, których potrzebujesz, plus jeden plugin-zbiorczy
+z wszystkimi siedmioma naraz.
+
+```bash
+# 1) Dodaj marketplace (raz)
+claude plugin marketplace add asterixix/polish-academic-skills
+
+# 2) Zainstaluj wybrany skill jako plugin
+claude plugin install polish-weather-hydrology@polish-academic-skills
+
+# ...albo wszystkie 7 naraz jednym pluginem
+claude plugin install polish-academic-skills-all@polish-academic-skills
+```
+
+Te same komendy działają jako `/plugin marketplace add ...` i
+`/plugin install ...` wewnątrz interaktywnej sesji Claude Code. Dostępne
+nazwy pluginów (`<nazwa>@polish-academic-skills`):
+
+`polish-academic-repositories`, `polish-science-bibliography`,
+`polish-open-data-statistics`, `polish-weather-hydrology`,
+`polish-legal-normative-documents`, `polish-culture-archives`,
+`polish-film-heritage`, oraz zbiorczy `polish-academic-skills-all`.
+
+Aktualizacja po zmianach w repo: `claude plugin marketplace update polish-academic-skills`
+(albo `claude plugin update <nazwa-pluginu>`).
+
+### Ręczne kopiowanie folderu (dla innych agentów / bez Claude Code)
+
 Skille rozpoznaje każdy agent zgodny z otwartym standardem Agent Skills —
 wystarczy skopiować folder danego skilla (`skills/<nazwa>/`) do właściwego
 katalogu skilli danego narzędzia.
 
-### Claude Code
+#### Claude Code (bez marketplace)
 
 ```bash
 # Osobiste (dostępne we wszystkich projektach)
@@ -68,34 +104,34 @@ cp -r skills/polish-weather-hydrology .claude/skills/
 
 Możesz skopiować dowolną liczbę folderów — każdy skill jest niezależny.
 
-### Claude.ai / Claude Cowork (Skills)
+#### Claude.ai / Claude Cowork (Skills)
 
 W ustawieniach **Settings → Capabilities → Skills** (plan Pro/Team/Enterprise)
 spakuj wybrany folder skilla do `.zip` (zawartość folderu, nie sam folder
 nadrzędny) i wgraj przez "Upload skill". Więcej:
 [Creating custom skills](https://support.claude.com/en/articles/12512198-creating-custom-skills).
 
-### Cursor
+#### Cursor
 
 ```bash
 cp -r skills/polish-weather-hydrology ~/.cursor/skills/   # globalnie
 cp -r skills/polish-weather-hydrology .cursor/skills/     # per projekt
 ```
 
-### Codex CLI (OpenAI)
+#### Codex CLI (OpenAI)
 
 ```bash
 cp -r skills/polish-weather-hydrology ~/.codex/skills/    # globalnie
 cp -r skills/polish-weather-hydrology .codex/skills/      # per projekt
 ```
 
-### GitHub Copilot (agent skills)
+#### GitHub Copilot (agent skills)
 
 ```bash
 cp -r skills/polish-weather-hydrology .github/skills/
 ```
 
-### Gemini CLI, OpenCode i inne
+#### Gemini CLI, OpenCode i inne
 
 Większość pozostałych hostów zgodnych ze standardem Agent Skills honoruje
 też uniwersalną, międzynarzędziową ścieżkę:

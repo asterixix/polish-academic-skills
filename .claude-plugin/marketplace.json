@@ -1,0 +1,121 @@
+{
+  "name": "polish-academic-skills",
+  "owner": {
+    "name": "Artur Sendyka",
+    "url": "https://github.com/asterixix"
+  },
+  "description": "Standalone, dependency-free Agent Skills for Polish academic, scientific, legal, cultural and public data sources -- ported from polish-academic-mcp, no MCP server required.",
+  "plugins": [
+    {
+      "name": "polish-academic-repositories",
+      "source": "./",
+      "skills": ["./skills/polish-academic-repositories"],
+      "strict": false,
+      "description": "Search and fetch metadata from Polish academic institutional repositories and open research-data repositories: Biblioteka Nauki, RCIN, RUJ, AGH, AMU, UAFM, ICM Open, RODBuK, and RePOD.",
+      "version": "1.0.0",
+      "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
+      "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-academic-repositories",
+      "repository": "https://github.com/asterixix/polish-academic-skills",
+      "license": "MIT",
+      "category": "research",
+      "keywords": ["poland", "academic", "repository", "publications", "research-data", "oai-pmh", "rcin", "ruj", "agh", "amu", "repod"]
+    },
+    {
+      "name": "polish-science-bibliography",
+      "source": "./",
+      "skills": ["./skills/polish-science-bibliography"],
+      "strict": false,
+      "description": "Query Polish science-bureaucracy and bibliography data: PBN (Polska Bibliografia Naukowa), POL-on/RAD-on institution datasets, and Ludzie Nauki researcher profiles.",
+      "version": "1.0.0",
+      "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
+      "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-science-bibliography",
+      "repository": "https://github.com/asterixix/polish-academic-skills",
+      "license": "MIT",
+      "category": "research",
+      "keywords": ["poland", "pbn", "polon", "radon", "orcid", "researchers", "bibliography"]
+    },
+    {
+      "name": "polish-open-data-statistics",
+      "source": "./",
+      "skills": ["./skills/polish-open-data-statistics"],
+      "strict": false,
+      "description": "Search Polish government open data (dane.gov.pl) and official regional statistics from GUS's Bank Danych Lokalnych (BDL).",
+      "version": "1.0.0",
+      "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
+      "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-open-data-statistics",
+      "repository": "https://github.com/asterixix/polish-academic-skills",
+      "license": "MIT",
+      "category": "data",
+      "keywords": ["poland", "open-data", "gus", "bdl", "statistics", "dane.gov.pl"]
+    },
+    {
+      "name": "polish-weather-hydrology",
+      "source": "./",
+      "skills": ["./skills/polish-weather-hydrology"],
+      "strict": false,
+      "description": "Real-time Polish weather, hydrology, and warnings data from IMGW-PIB (danepubliczne.imgw.pl), no API key required.",
+      "version": "1.0.0",
+      "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
+      "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-weather-hydrology",
+      "repository": "https://github.com/asterixix/polish-academic-skills",
+      "license": "MIT",
+      "category": "weather",
+      "keywords": ["poland", "imgw", "weather", "hydrology", "warnings"]
+    },
+    {
+      "name": "polish-legal-normative-documents",
+      "source": "./",
+      "skills": ["./skills/polish-legal-normative-documents"],
+      "strict": false,
+      "description": "Search Polish legal acts (ISAP/ELI), the Biblioteka Sejmowa parliamentary library catalog, court judgments (SAOS), and PKN technical standards.",
+      "version": "1.0.0",
+      "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
+      "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-legal-normative-documents",
+      "repository": "https://github.com/asterixix/polish-academic-skills",
+      "license": "MIT",
+      "category": "legal",
+      "keywords": ["poland", "isap", "eli", "dziennik-ustaw", "saos", "court-judgments", "pkn", "standards"]
+    },
+    {
+      "name": "polish-culture-archives",
+      "source": "./",
+      "skills": ["./skills/polish-culture-archives"],
+      "strict": false,
+      "description": "Query Polish cultural-heritage archives and catalogs: Baza Legalnych Zrodel, BazTOL, NAC (National Digital Archive), Katalog Biblioteki SUM (Aleph), PAUart, Wolne Lektury, and Dokumenty Slaska.",
+      "version": "1.0.0",
+      "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
+      "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-culture-archives",
+      "repository": "https://github.com/asterixix/polish-academic-skills",
+      "license": "MIT",
+      "category": "culture",
+      "keywords": ["poland", "culture", "archives", "nac", "wolne-lektury", "digital-heritage"]
+    },
+    {
+      "name": "polish-film-heritage",
+      "source": "./",
+      "skills": ["./skills/polish-film-heritage"],
+      "strict": false,
+      "description": "Search Polish film and photography heritage archives: Ninateka, Gapla, Fototeka, FilmPolski.pl, Fototeka Slaska, and the FN digital repository.",
+      "version": "1.0.0",
+      "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
+      "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-film-heritage",
+      "repository": "https://github.com/asterixix/polish-academic-skills",
+      "license": "MIT",
+      "category": "culture",
+      "keywords": ["poland", "film", "fina", "filmpolski", "photography", "archives"]
+    },
+    {
+      "name": "polish-academic-skills-all",
+      "source": "./",
+      "strict": false,
+      "description": "Bundle of all 7 polish-academic-skills: academic repositories, science bibliography, open data/statistics, weather/hydrology, legal/normative documents, culture archives, and film heritage.",
+      "version": "1.0.0",
+      "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
+      "homepage": "https://github.com/asterixix/polish-academic-skills",
+      "repository": "https://github.com/asterixix/polish-academic-skills",
+      "license": "MIT",
+      "category": "research",
+      "keywords": ["poland", "bundle", "all-skills", "academic", "culture", "legal", "data"]
+    }
+  ]
+}
