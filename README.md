@@ -30,7 +30,7 @@ asterixix/polish-academic-skills`, patrz [Instalacja](#instalacja).
 | [`polish-open-data-statistics`](skills/polish-open-data-statistics/SKILL.md) | Dane otwarte i statystyka publiczna | dane.gov.pl, BDL/GUS (w tym dane ze stat.gov.pl) |
 | [`polish-weather-hydrology`](skills/polish-weather-hydrology/SKILL.md) | Pogoda i hydrologia w czasie rzeczywistym | IMGW-PIB |
 | [`polish-legal-normative-documents`](skills/polish-legal-normative-documents/SKILL.md) | Akty prawne, orzeczenia sądów, normy | ISAP/ELI, Biblioteka Sejmowa, SAOS, PKN, WIEDZA-PKN |
-| [`polish-culture-archives`](skills/polish-culture-archives/SKILL.md) | Dziedzictwo kulturowe i archiwa | Baza Legalnych Źródeł, BazTOL, NAC, Katalog ŚUM (Aleph), PAUart, Wolne Lektury, Dokumenty Śląska, Ofiary IPN, EDUKATOR |
+| [`polish-culture-archives`](skills/polish-culture-archives/SKILL.md) | Dziedzictwo kulturowe i archiwa | Baza Legalnych Źródeł, BazTOL, NAC, Katalog ŚUM (Aleph), PAUart, Wolne Lektury, Dokumenty Śląska, Ofiary IPN, EDUKATOR, Academica, Chmura Czytania |
 | [`polish-film-heritage`](skills/polish-film-heritage/SKILL.md) | Dziedzictwo filmowe i fotograficzne | Ninateka, Gapla, Fototeka, FilmPolski.pl, Fototeka Śląska, Repozytorium FN |
 | [`polish-educational-resources`](skills/polish-educational-resources/SKILL.md) | Otwarte podręczniki szkolne K-12 | epodreczniki.pl (ORE/MEN) |
 
@@ -183,13 +183,18 @@ lat) są opisane w `SKILL.md` odpowiedniego skilla.
 adres bazowy OAI-PMH — patrz docstring skryptu i uruchom `identify` przed
 `search`/`get`.
 
-`ofiary_ipn.py` i `bgbase_edu.py` (`polish-culture-archives`) mają
-potwierdzone na żywo nazwy pól formularzy i endpointy, ale nie widziano
-jeszcze strony z realnymi trafieniami (tylko pustą stronę wyszukiwania /
-"brak wyników") — struktura pojedynczego rekordu w wynikach nie jest
-jeszcze sparsowana, skrypty zawsze zwracają też surowy HTML. `emis.py`
+`ofiary_ipn.py`, `bgbase_edu.py` i `academica.py` (`polish-culture-archives`)
+mają potwierdzone na żywo nazwy pól formularzy/endpointy (dla `academica.py`
+także cały dwuetapowy przepływ JSF/RichFaces z ciasteczkiem sesji i
+`javax.faces.ViewState`), ale nie widziano jeszcze strony z realnymi
+trafieniami — struktura pojedynczego rekordu w wynikach nie jest jeszcze
+sparsowana, skrypty zawsze zwracają też surowy HTML. `emis.py`
 (`polish-academic-repositories`) to czysty katalog statyczny — potwierdzono
-na żywo, że nie ma tam żadnego wyszukiwania ani API.
+na żywo, że nie ma tam żadnego wyszukiwania ani API. `chmuraczytania.py`
+(`polish-culture-archives`) też nie ma wyszukiwania po stronie serwera —
+potwierdzony na żywo katalog (`catalog.php`) jest w pełni sparsowany
+(id/tytuł/autor), a `search` filtruje po tytule/autorze po stronie klienta,
+przechodząc kolejne strony katalogu.
 
 **`archiwa.gov.pl` / `szukajwarchiwach.gov.pl` — sprawdzone i odrzucone.**
 Oba adresy są za Incapsula (WAF przeciw botom) na poziomie HTTP, nie tylko
@@ -199,15 +204,18 @@ prawdziwej przeglądarki (headless) wykonującej JS, co łamie założenie tego
 projektu "tylko biblioteka standardowa, zero zależności" — nie będzie tu
 zaimplementowane, chyba że ktoś zaakceptuje dodanie takiej zależności.
 
-**Źródła nadal czekające na kolejną rundę testów na żywo** (brak
-potwierdzonego publicznego API lub pierwsza próba nie dała jednoznacznej
-odpowiedzi): academica.edu.pl (błąd cookie w PowerShell — spróbuj przez
-`curl.exe` albo devtools), infona.pl (strona bez `<form>` — wyszukiwanie
-idzie przez JS, potrzebne "Copy as cURL" z devtools), chmuraczytania.pl
-(formularz wyszukiwania nie jest na stronie głównej — sprawdź
-`catalog.php`), powstania.pilsudski.org (strona `/osoby` ma ~3.5 MB, trzeba
-z niej wyciągnąć fragment z `<form>` albo sprawdzić `js/ajax_req.js` pod
-kątem wywołań AJAX/fetch).
+**infona.pl — pominięte na życzenie** (nie jest obecnie priorytetem;
+strona zresztą i tak nie ma `<form>` na stronie głównej, wyszukiwanie idzie
+przez JS — do ewentualnego podjęcia w przyszłości potrzebne "Copy as cURL"
+z devtools).
+
+**Źródła nadal czekające na kolejną rundę testów na żywo**:
+powstania.pilsudski.org — `ajax_req.js` potwierdza generyczny mechanizm AJAX
+(`{url_base}/ajax_req.php?aaction=<action>&...`, gdzie `url_base =
+https://powstania.pilsudski.org`), ale konkretna nazwa `action` używana przy
+wyszukiwaniu osób nie jest w tym pliku — jest w `js/front.js` albo w inline
+`<script>` na stronie `/osoby`. Potrzebny albo `front.js`, albo fragment
+strony `/osoby` z wywołaniami `JSONAsyncRequest`/`aaction=`.
 
 ## Źródło i licencja
 

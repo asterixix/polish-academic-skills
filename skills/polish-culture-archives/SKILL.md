@@ -1,20 +1,21 @@
 ---
 name: polish-culture-archives
-description: Query Polish cultural heritage, archives, and reference catalogs - Baza Legalnych Zrodel (legal digital-culture sources directory), BazTOL (technical-science web gateway, stale since 2022), NAC / Narodowe Archiwum Cyfrowe (National Digital Archive news + WordPress content), Katalog Biblioteki SUM (medical-university Aleph library catalog), PAUart (PAU fine-arts catalog), Wolne Lektury (free ebook library of Polish literature), Dokumenty Slaska (static historical-documents site), Centrum Informacji o Ofiarach II Wojny Swiatowej / IPN (WWII victims database), and EDUKATOR (Pedagogical University of Krakow staff bibliography). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to every free-text-searchable source in this skill in parallel. Use when the user asks about Polish cultural heritage, digital archives, archiwa cyfrowe, dziedzictwo kulturowe, legalne zrodla kultury, BazTOL, NAC, National Digital Archive, katalog biblioteczny Aleph, PAUart, dziela sztuki, Wolne Lektury, wolne lektury, free ebooks Polish literature, biblioteka cyfrowa, medieval Silesian documents, ofiary wojny, IPN, druga wojna swiatowa, or bibliografia pracownikow uczelni. No API keys needed for any of these sources.
+description: Query Polish cultural heritage, archives, and reference catalogs - Baza Legalnych Zrodel (legal digital-culture sources directory), BazTOL (technical-science web gateway, stale since 2022), NAC / Narodowe Archiwum Cyfrowe (National Digital Archive news + WordPress content), Katalog Biblioteki SUM (medical-university Aleph library catalog), PAUart (PAU fine-arts catalog), Wolne Lektury (free ebook library of Polish literature), Dokumenty Slaska (static historical-documents site), Centrum Informacji o Ofiarach II Wojny Swiatowej / IPN (WWII victims database), EDUKATOR (Pedagogical University of Krakow staff bibliography), Academica (Biblioteka Narodowa digital lending catalog), and Chmura Czytania (free classic-literature digital library). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to every free-text-searchable source in this skill in parallel. Use when the user asks about Polish cultural heritage, digital archives, archiwa cyfrowe, dziedzictwo kulturowe, legalne zrodla kultury, BazTOL, NAC, National Digital Archive, katalog biblioteczny Aleph, PAUart, dziela sztuki, Wolne Lektury, wolne lektury, free ebooks Polish literature, biblioteka cyfrowa, medieval Silesian documents, ofiary wojny, IPN, druga wojna swiatowa, bibliografia pracownikow uczelni, Academica, Biblioteka Narodowa, wypozyczalnia cyfrowa, or Chmura Czytania. No API keys needed for any of these sources.
 ---
 
 # Polish Culture Archives
 
 Standalone, dependency-free Python 3 scripts (standard library only) for
-nine Polish cultural-heritage and reference sources. No API keys are
+eleven Polish cultural-heritage and reference sources. No API keys are
 needed anywhere in this skill. Seven were ported from the
 `polish-academic-mcp` MCP server's tools of the same names, with the MCP
 layer and Cloudflare KV caching stripped out so each script runs as a plain
-CLI; two (`ofiary_ipn.py`, `bgbase_edu.py`) were added directly to this
-skill based on live-verified HTML form dumps (see their docstrings for what
-was actually confirmed against the real server vs. best-effort).
+CLI; four (`ofiary_ipn.py`, `bgbase_edu.py`, `academica.py`,
+`chmuraczytania.py`) were added directly to this skill based on
+live-verified HTML/form dumps (see each script's docstring for exactly what
+was confirmed against the real server vs. best-effort).
 
-## The 9 sources at a glance
+## The 11 sources at a glance
 
 | Source | What it is | Format | Notes |
 |---|---|---|---|
@@ -27,18 +28,21 @@ was actually confirmed against the real server vs. best-effort).
 | **Dokumenty Slaska** | Static site of medieval Silesian documents, regesty, heraldry | HTML (static pages) | No API, no search; fixed navigation list only |
 | **Centrum Informacji o Ofiarach II WS** (IPN) | WWII victims/records database, `ofiary.ipn.gov.pl` | HTML (POSTs the real search form) | Field names confirmed live; the shape of a *populated* results page is not yet confirmed (see script docstring) |
 | **EDUKATOR** (bgbase.up.krakow.pl) | Staff/doctoral-student publication bibliography, Pedagogical University of Krakow | HTML (Expertus CGI, iso-8859-2) | Query confirmed working live (verified "no results" response); populated-results shape not yet confirmed |
+| **Academica** | Biblioteka Narodowa (National Library) digital inter-library lending catalog | HTML (JSF/RichFaces postback) | Multi-step session flow (ViewState + cookie) confirmed correct; result-page shape not yet confirmed. Copyrighted full text requires a library terminal -- catalog search only. |
+| **Chmura Czytania** | Free digital library of classic literature (Fundacja Festina Lente) | HTML (static PHP catalog) | No server-side search -- `search` pages through the catalog and filters client-side by title/author |
 
 ## Search across every source at once
 
 For any broad topic query, don't stop at the first source that answers --
 run **`scripts/search_all.py --query "..."`** first. It fans the query out
 in parallel to BazTOL, BLZ, NAC, PAUart, Katalog SUM, Centrum Informacji o
-Ofiarach II WS (IPN), and EDUKATOR (everything with a real free-text
-search) and returns one combined JSON with a `results` object keyed by
-source. Per-source failures (including Katalog SUM's known SRU-gate
-outage) never abort the others. Wolne Lektury and Dokumenty Slaska are
-taxonomy/path-browsing only (no keyword query) and are listed separately
-in the aggregator's output -- call them directly instead.
+Ofiarach II WS (IPN), EDUKATOR, Academica, and Chmura Czytania (everything
+with a real free-text search, or a client-side filter standing in for one)
+and returns one combined JSON with a `results` object keyed by source.
+Per-source failures (including Katalog SUM's known SRU-gate outage) never
+abort the others. Wolne Lektury and Dokumenty Slaska are taxonomy/path-
+browsing only (no keyword query) and are listed separately in the
+aggregator's output -- call them directly instead.
 
 ```bash
 python3 scripts/search_all.py --query "Śląsk"
@@ -78,7 +82,11 @@ stderr and exits 1.
 | `dokumenty_slaska.py` | `medieval-catalog` | `dokumenty_slaska_medieval_catalog` |
 | `ofiary_ipn.py` | `search --query --scope --exact-phrase --exclude-words --or-term1/2/3 --date-from --date-to --category` | *(new -- not from the MCP port)* POSTs the real search form on ofiary.ipn.gov.pl. |
 | `bgbase_edu.py` | `search --query1 --field1 --query2 --field2 --query3 --field3 --combine --sort --format --page-size` | *(new -- not from the MCP port)* GETs the EDUKATOR Expertus CGI (Uniwersytet Pedagogiczny w Krakowie). |
-| `search_all.py` | `--query --sum-base` | *(new -- not from the MCP port)* Fans one query out to BazTOL, BLZ, NAC, PAUart, Katalog SUM, ofiary_ipn, and bgbase_edu in parallel. |
+| `academica.py` | `search --query` | *(new -- not from the MCP port)* Two-step JSF/RichFaces postback flow against academica.edu.pl. |
+| `chmuraczytania.py` | `list-categories` | *(new -- not from the MCP port)* Fixed list, no network request. |
+| `chmuraczytania.py` | `browse-category --category --page` | *(new -- not from the MCP port)* Raw catalog page listing. |
+| `chmuraczytania.py` | `search --query --category --max-pages` | *(new -- not from the MCP port)* Client-side title/author filter across paginated catalog (no server-side search exists). |
+| `search_all.py` | `--query --sum-base` | *(new -- not from the MCP port)* Fans one query out to BazTOL, BLZ, NAC, PAUart, Katalog SUM, ofiary_ipn, bgbase_edu, academica, and chmuraczytania in parallel. |
 
 Gnarly per-source parsing/parameter details (exact request bodies, XML
 shapes, domain id tables, path-validation algorithm) are in
@@ -166,6 +174,8 @@ python3 scripts/dokumenty_slaska.py get-page --path "indeks 1200.html"
 - Dokumenty Slaska: https://www.dokumentyslaska.pl/
 - Centrum Informacji o Ofiarach II WS (IPN): https://ofiary.ipn.gov.pl/ofi/search
 - EDUKATOR (bgbase.up.krakow.pl): http://bgbase.up.krakow.pl/biblio/bibliografia/index.php?base=edu
+- Academica: https://academica.edu.pl/
+- Chmura Czytania: http://www.chmuraczytania.pl/catalog.php
 
 ## Attribution
 

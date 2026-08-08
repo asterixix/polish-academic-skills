@@ -81,14 +81,14 @@
       "source": "./",
       "skills": ["./skills/polish-culture-archives"],
       "strict": false,
-      "description": "Query Polish cultural-heritage archives and catalogs: Baza Legalnych Zrodel, BazTOL, NAC (National Digital Archive), Katalog Biblioteki SUM (Aleph), PAUart, Wolne Lektury, Dokumenty Slaska, Centrum Informacji o Ofiarach II WS (IPN), and EDUKATOR. Includes search_all.py to query the free-text sources at once.",
-      "version": "1.2.0",
+      "description": "Query Polish cultural-heritage archives and catalogs: Baza Legalnych Zrodel, BazTOL, NAC (National Digital Archive), Katalog Biblioteki SUM (Aleph), PAUart, Wolne Lektury, Dokumenty Slaska, Centrum Informacji o Ofiarach II WS (IPN), EDUKATOR, Academica, and Chmura Czytania. Includes search_all.py to query the free-text sources at once.",
+      "version": "1.3.0",
       "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
       "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-culture-archives",
       "repository": "https://github.com/asterixix/polish-academic-skills",
       "license": "MIT",
       "category": "culture",
-      "keywords": ["poland", "culture", "archives", "nac", "wolne-lektury", "digital-heritage", "ipn", "edukator"]
+      "keywords": ["poland", "culture", "archives", "nac", "wolne-lektury", "digital-heritage", "ipn", "edukator", "academica", "chmuraczytania"]
     },
     {
       "name": "polish-film-heritage",
