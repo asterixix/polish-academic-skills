@@ -1,6 +1,6 @@
 ---
 name: polish-legal-normative-documents
-description: Search and fetch Polish legal acts, parliamentary library catalog records, court judgments, and technical/industry standards without an MCP server. Covers ISAP/ELI (akty prawne, Dziennik Ustaw, Monitor Polski, ustawy, rozporządzenia), Biblioteka Sejmowa OPAC catalog, SAOS (orzeczenia sądowe, court judgments), PKN website search, and WIEDZA-PKN Polish Standards (normy, PN-EN ISO). Use for "Polish legal acts", "ISAP", "ELI", "Dziennik Ustaw", "akty prawne", "court judgments", "SAOS", "orzeczenia sądowe", "Biblioteka Sejmowa", "PKN", "normy", "Polish Standards".
+description: Search and fetch Polish legal acts, parliamentary library catalog records, court judgments, and technical/industry standards without an MCP server. Covers ISAP/ELI (akty prawne, Dziennik Ustaw, Monitor Polski, ustawy, rozporządzenia), Biblioteka Sejmowa OPAC catalog, SAOS (orzeczenia sądowe, court judgments), PKN website search, and WIEDZA-PKN Polish Standards (normy, PN-EN ISO). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to all five sources in parallel. Use for "Polish legal acts", "ISAP", "ELI", "Dziennik Ustaw", "akty prawne", "court judgments", "SAOS", "orzeczenia sądowe", "Biblioteka Sejmowa", "PKN", "normy", "Polish Standards".
 ---
 
 # Polish Legal & Normative Documents
@@ -35,7 +35,27 @@ website content. It does **not** search Polish Standards -- for that you
 need `wiedza.py` (the WIEDZA norms catalog, a different subdomain/backend
 entirely).
 
+## Search across every source at once
+
+For any broad topic query, don't stop at the first source that answers --
+run **`scripts/search_all.py --query "..."`** first. It fans the query out
+in parallel to Biblioteka Sejmowa, ISAP, PKN, SAOS, and WIEDZA-PKN (mapped
+to each source's closest free-text-equivalent field -- see the script's
+docstring) and returns one combined JSON with a `results` object keyed by
+source. Use the individual scripts directly when you need a filter this
+aggregator doesn't expose (SAOS court/date filters, ISAP publisher/year,
+WIEDZA ICS code, etc.).
+
+```bash
+python3 scripts/search_all.py --query "ochrona danych osobowych"
+```
+
 ## Scripts
+
+### `scripts/search_all.py` -- cross-source fan-out *(new -- not from the MCP port)*
+
+Runs the five scripts below as parallel subprocesses and merges their JSON
+output. See "Search across every source at once" above.
 
 ### `scripts/isap.py` -- ISAP / ELI API (JSON, no key)
 

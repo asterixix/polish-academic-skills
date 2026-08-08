@@ -1,6 +1,6 @@
 ---
 name: polish-culture-archives
-description: Query Polish cultural heritage, archives, and reference catalogs - Baza Legalnych Zrodel (legal digital-culture sources directory), BazTOL (technical-science web gateway, stale since 2022), NAC / Narodowe Archiwum Cyfrowe (National Digital Archive news + WordPress content), Katalog Biblioteki SUM (medical-university Aleph library catalog), PAUart (PAU fine-arts catalog), Wolne Lektury (free ebook library of Polish literature), and Dokumenty Slaska (static historical-documents site). Use when the user asks about Polish cultural heritage, digital archives, archiwa cyfrowe, dziedzictwo kulturowe, legalne zrodla kultury, BazTOL, NAC, National Digital Archive, katalog biblioteczny Aleph, PAUart, dziela sztuki, Wolne Lektury, wolne lektury, free ebooks Polish literature, biblioteka cyfrowa, or medieval Silesian documents. No API keys needed for any of these sources.
+description: Query Polish cultural heritage, archives, and reference catalogs - Baza Legalnych Zrodel (legal digital-culture sources directory), BazTOL (technical-science web gateway, stale since 2022), NAC / Narodowe Archiwum Cyfrowe (National Digital Archive news + WordPress content), Katalog Biblioteki SUM (medical-university Aleph library catalog), PAUart (PAU fine-arts catalog), Wolne Lektury (free ebook library of Polish literature), and Dokumenty Slaska (static historical-documents site). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to every free-text-searchable source in this skill in parallel. Use when the user asks about Polish cultural heritage, digital archives, archiwa cyfrowe, dziedzictwo kulturowe, legalne zrodla kultury, BazTOL, NAC, National Digital Archive, katalog biblioteczny Aleph, PAUart, dziela sztuki, Wolne Lektury, wolne lektury, free ebooks Polish literature, biblioteka cyfrowa, or medieval Silesian documents. No API keys needed for any of these sources.
 ---
 
 # Polish Culture Archives
@@ -22,6 +22,21 @@ caching stripped out so each script runs as a plain CLI.
 | **PAUart** | Fine-arts catalog of the Polish Academy of Arts and Sciences (PAU) | JSON (Collectio/Elasticsearch) | |
 | **Wolne Lektury** | Free ebook library of (mostly public-domain) Polish literature | JSON (official API) | No full-text search; filter by taxonomy instead |
 | **Dokumenty Slaska** | Static site of medieval Silesian documents, regesty, heraldry | HTML (static pages) | No API, no search; fixed navigation list only |
+
+## Search across every source at once
+
+For any broad topic query, don't stop at the first source that answers --
+run **`scripts/search_all.py --query "..."`** first. It fans the query out
+in parallel to BazTOL, BLZ, NAC, PAUart, and Katalog SUM (everything with a
+real free-text search) and returns one combined JSON with a `results`
+object keyed by source. Per-source failures (including Katalog SUM's known
+SRU-gate outage) never abort the others. Wolne Lektury and Dokumenty Slaska
+are taxonomy/path-browsing only (no keyword query) and are listed
+separately in the aggregator's output -- call them directly instead.
+
+```bash
+python3 scripts/search_all.py --query "Śląsk"
+```
 
 ## Scripts and subcommands
 
@@ -55,6 +70,7 @@ stderr and exits 1.
 | `wolne_lektury.py` | `get-collection --slug` | `wolnelektury_get_collection` |
 | `dokumenty_slaska.py` | `get-page --path` | `dokumenty_slaska_get_page` |
 | `dokumenty_slaska.py` | `medieval-catalog` | `dokumenty_slaska_medieval_catalog` |
+| `search_all.py` | `--query --sum-base` | *(new -- not from the MCP port)* Fans one query out to BazTOL, BLZ, NAC, PAUart, and Katalog SUM in parallel. |
 
 Gnarly per-source parsing/parameter details (exact request bodies, XML
 shapes, domain id tables, path-validation algorithm) are in

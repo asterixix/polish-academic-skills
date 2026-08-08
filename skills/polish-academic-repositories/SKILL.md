@@ -1,12 +1,12 @@
 ---
 name: polish-academic-repositories
-description: Search and fetch metadata from Polish academic institutional repositories and open research-data repositories -- Biblioteka Nauki, RCIN, RUJ (Jagiellonian University), AGH, AMU (Adam Mickiewicz University), UAFM, ICM Open, RODBuK, and RePOD. Covers publications, theses, dissertations, articles, book chapters, and research datasets. Use for "Polish academic repositories", "Polish university repository", "RCIN", "RUJ", "AGH repository", "AMU repository", "UAFM", "ICM open data", "RODBuK", "RePOD", "Biblioteka Nauki", "polskie repozytoria naukowe", "prace naukowe", "publikacje naukowe", "rozprawy doktorskie", "prace dyplomowe", "dane badawcze", "repozytorium uczelniane", "DSpace", "OAI-PMH", "Dataverse". No API keys needed for any of these sources.
+description: Search and fetch metadata from Polish academic institutional repositories and open research-data repositories -- Biblioteka Nauki, RCIN, RUJ (Jagiellonian University), AGH, AMU (Adam Mickiewicz University), UAFM, ICM Open, RODBuK, RePOD, Depot CeON, and PPM (Polska Platforma Medyczna). Covers publications, theses, dissertations, articles, book chapters, and research datasets. IMPORTANT -- for any broad topic search ("find publications about X"), run `scripts/search_all.py --query X` first: it fans out the query to every free-text-searchable source in this skill in parallel so results are never limited to a single repository. Use for "Polish academic repositories", "Polish university repository", "RCIN", "RUJ", "AGH repository", "AMU repository", "UAFM", "ICM open data", "RODBuK", "RePOD", "Depot CeON", "PPM", "Polska Platforma Medyczna", "Biblioteka Nauki", "polskie repozytoria naukowe", "prace naukowe", "publikacje naukowe", "rozprawy doktorskie", "prace dyplomowe", "dane badawcze", "repozytorium uczelniane", "DSpace", "OAI-PMH", "Dataverse". No API keys needed for any of these sources.
 ---
 
 # Polish Academic Repositories
 
 Standalone Python 3 CLI tools (standard library only, no dependencies, no
-MCP server) for searching and fetching metadata from nine Polish academic
+MCP server) for searching and fetching metadata from eleven Polish academic
 and open research-data repositories:
 
 - **Biblioteka Nauki** -- Poland's largest open-access publication database (articles, books, chapters).
@@ -18,11 +18,30 @@ and open research-data repositories:
 - **ICM** -- Otwarte Dane Badawcze UW (ICM Open Research Data Repository, University of Warsaw).
 - **RODBuK** -- Krakow inter-university open research-data repository (6 member universities).
 - **RePOD** -- ICM Warsaw open research-data repository.
+- **Depot CeON** -- Repozytorium Centrum Otwartej Nauki (ICM University of Warsaw), OAI-PMH only.
+- **PPM** -- Polska Platforma Medyczna, a joint CRIS repository of 7 medical universities + 1 institute, OAI-PMH only.
 
 Use this skill when someone wants to find Polish theses, dissertations,
 journal articles, book chapters, or open research datasets, or needs to
 pull structured metadata (title, authors, abstract, DOI, dates, license)
 for a specific item once its ID/UUID/DOI is known.
+
+## Search across every source at once
+
+For any broad topic query, don't stop at the first source that answers --
+run **`scripts/search_all.py --query "..."`** first. It fans the query out
+in parallel to Biblioteka Nauki, RUJ, AGH, AMU, UAFM, ICM, RODBuK, and RePOD
+(everything with a real free-text search), and returns one combined JSON
+with a `results` object keyed by source. Per-source failures never abort
+the others. RCIN, Depot CeON, PPM, and Biblioteka Nauki's `search-articles`
+are OAI-PMH-only (no keyword query) and are listed separately in the
+aggregator's output as `sources_not_included` -- call them directly with
+`--from-date`/`--until-date`/`--set` when a date-range harvest is what's
+needed instead.
+
+```bash
+python3 scripts/search_all.py --query "sztuczna inteligencja" --size 5
+```
 
 **No API keys required for any source in this skill.** All endpoints are
 public, read-only, and anonymous.
@@ -75,6 +94,12 @@ Every command prints a JSON object to stdout on success, or a clear
 | `rodbuk.py` | `search` | RODBuK | Search datasets/dataverses/files (Harvard Dataverse search API). Use `--query '*'` to browse everything. |
 | `repod.py` | `search` | RePOD | Search datasets/dataverses/files (Dataverse search API). |
 | `repod.py` | `get-dataset` | RePOD | Dataset metadata by DOI, in one of several export formats. |
+| `depot_ceon.py` | `search` | Depot CeON | OAI-PMH `ListRecords` -- harvest by date range and/or OAI setSpec. No keyword query. |
+| `depot_ceon.py` | `get` | Depot CeON | OAI-PMH `GetRecord` -- single object by handle suffix or full OAI identifier. |
+| `ppm.py` | `identify` | PPM | OAI-PMH `Identify` -- cheap sanity check; run before `search`/`get` since the base URL is unverified (see script docstring). |
+| `ppm.py` | `search` | PPM | OAI-PMH `ListRecords` -- harvest by date range and/or OAI setSpec. No keyword query. |
+| `ppm.py` | `get` | PPM | OAI-PMH `GetRecord` -- single object by full OAI identifier. |
+| `search_all.py` | *(n/a)* | all of the above | Fans one `--query` out to every free-text source in parallel. See "Search across every source at once" above. |
 
 Full per-parameter reference (all filter fields, default operators,
 sort options, metadata formats) is in [`reference/API.md`](reference/API.md)
@@ -237,13 +262,18 @@ marks the response with `"fallback_format": "dataverse_json"`.
 ## Important caveats
 
 - **OAI-PMH vs. free-text search.** Biblioteka Nauki's `search-articles`,
-  RCIN's `search`, and (indirectly) the RUJ/AGH/AMU/UAFM/ICM `search`
-  commands' underlying protocols differ: `bn_search_articles`/`rcin
-  search` are **OAI-PMH harvesting** -- they slice by date range
+  RCIN's `search`, Depot CeON's `search`, PPM's `search`, and (indirectly)
+  the RUJ/AGH/AMU/UAFM/ICM `search` commands' underlying protocols differ:
+  `bn_search_articles`/`rcin search`/`depot_ceon search`/`ppm search` are
+  **OAI-PMH harvesting** -- they slice by date range
   (`--from-date`/`--until-date`) and/or a named OAI `set`, and do **not**
   accept a keyword query. For keyword search on Biblioteka Nauki, use
   `search-publications` instead. RUJ/AGH/AMU/UAFM/ICM are DSpace
   discovery-search endpoints and do accept a full-text `--query`.
+- **PPM's base URL is unverified.** `ppm.py`'s OAI-PMH endpoint was found
+  via web search, not live-tested from this environment. Run
+  `ppm.py identify` first -- if it fails, see the script's module docstring
+  for the alternate URL to try.
 - **Pagination.** OAI-PMH sources page via an opaque `resumption_token`
   returned in the previous response -- pass it back verbatim on the next
   call, with no other search parameters (the OAI-PMH spec forbids mixing
@@ -306,6 +336,8 @@ marks the response with `"fallback_format": "dataverse_json"`.
 - ICM Open: https://open.icm.edu.pl (REST: `/server/api`)
 - RODBuK: https://rodbuk.pl (REST: `/api`)
 - RePOD: https://repod.icm.edu.pl (REST: `/api`)
+- Depot CeON: https://depot.ceon.pl (OAI-PMH: `/oai/request`)
+- PPM: https://ppm.edu.pl (OAI-PMH: `ppm.edu.pl:7443/oaicat/`, base URL unverified -- see `ppm.py` docstring)
 
 ## Attribution
 

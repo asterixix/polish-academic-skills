@@ -1,6 +1,6 @@
 ---
 name: polish-film-heritage
-description: Searches and fetches records from Polish film and photography heritage archives (mostly Filmoteka Narodowa / FINA sources) -- Ninateka VOD, Gapla poster gallery, Fototeka photo archive, FilmPolski.pl database, Fototeka Śląska (Silesian photo archive), and the FN digital repository. All HTML-scraped except Ninateka (JSON API). Use for Polish film heritage, FINA, Filmoteka Narodowa, film posters, movie posters Poland, FilmPolski, polskie filmy, plakaty filmowe, fotosy filmowe, archiwum filmowe, historia kina polskiego, filmoteka, wyszukiwarka filmów.
+description: Searches and fetches records from Polish film and photography heritage archives (mostly Filmoteka Narodowa / FINA sources) -- Ninateka VOD, Gapla poster gallery, Fototeka photo archive, FilmPolski.pl database, Fototeka Śląska (Silesian photo archive), and the FN digital repository. All HTML-scraped except Ninateka (JSON API). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to all six sources in parallel. Use for Polish film heritage, FINA, Filmoteka Narodowa, film posters, movie posters Poland, FilmPolski, polskie filmy, plakaty filmowe, fotosy filmowe, archiwum filmowe, historia kina polskiego, filmoteka, wyszukiwarka filmów.
 ---
 
 # Polish Film Heritage
@@ -37,10 +37,24 @@ a fallback so nothing is lost if the structured fields come back empty or
 wrong. See `reference/API.md` for exactly which parsing is a direct port
 vs. new best-effort heuristic, and why.
 
+## Search across every source at once
+
+For any broad topic query, don't stop at the first source that answers --
+run **`scripts/search_all.py --query "..."`** first. All six sources in
+this skill support a plain `--query` search, so it fans out to every one of
+them in parallel and returns one combined JSON with a `results` object
+keyed by source. Per-source failures (timeouts, layout-change scraping
+breakage) never abort the others.
+
+```bash
+python3 scripts/search_all.py --query "Wajda"
+```
+
 ## Scripts
 
 | Script | Subcommand | Description |
 |---|---|---|
+| `scripts/search_all.py` | *(n/a)* | Fans one `--query` out to all six sources below in parallel. See "Search across every source at once" above. |
 | `scripts/ninateka.py` | `search` | Search Ninateka VOD items by keyword. |
 | `scripts/ninateka.py` | `get-vod` | Full metadata for one item by numeric id. |
 | `scripts/gapla.py` | `search` | Search film posters by title/artist/director. |

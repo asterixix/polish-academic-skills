@@ -25,17 +25,27 @@ asterixix/polish-academic-skills`, patrz [Instalacja](#instalacja).
 
 | Skill | Zakres | Źródła |
 | --- | --- | --- |
-| [`polish-academic-repositories`](skills/polish-academic-repositories/SKILL.md) | Repozytoria naukowe uczelni i dane badawcze | Biblioteka Nauki, RCIN, RUJ (UJ), AGH, AMU (UAM), UAFM, ICM Open, RODBuK, RePOD |
-| [`polish-science-bibliography`](skills/polish-science-bibliography/SKILL.md) | Bibliografia naukowa i profile badaczy | PBN, POL-on/RAD-on, Ludzie Nauki |
-| [`polish-open-data-statistics`](skills/polish-open-data-statistics/SKILL.md) | Dane otwarte i statystyka publiczna | dane.gov.pl, BDL/GUS |
+| [`polish-academic-repositories`](skills/polish-academic-repositories/SKILL.md) | Repozytoria naukowe uczelni i dane badawcze | Biblioteka Nauki, RCIN, RUJ (UJ), AGH, AMU (UAM), UAFM, ICM Open, RODBuK, RePOD, Depot CeON, PPM |
+| [`polish-science-bibliography`](skills/polish-science-bibliography/SKILL.md) | Bibliografia naukowa i profile badaczy | PBN, POL-on/RAD-on, Ludzie Nauki (następca nauka-polska.pl) |
+| [`polish-open-data-statistics`](skills/polish-open-data-statistics/SKILL.md) | Dane otwarte i statystyka publiczna | dane.gov.pl, BDL/GUS (w tym dane ze stat.gov.pl) |
 | [`polish-weather-hydrology`](skills/polish-weather-hydrology/SKILL.md) | Pogoda i hydrologia w czasie rzeczywistym | IMGW-PIB |
 | [`polish-legal-normative-documents`](skills/polish-legal-normative-documents/SKILL.md) | Akty prawne, orzeczenia sądów, normy | ISAP/ELI, Biblioteka Sejmowa, SAOS, PKN, WIEDZA-PKN |
 | [`polish-culture-archives`](skills/polish-culture-archives/SKILL.md) | Dziedzictwo kulturowe i archiwa | Baza Legalnych Źródeł, BazTOL, NAC, Katalog ŚUM (Aleph), PAUart, Wolne Lektury, Dokumenty Śląska |
 | [`polish-film-heritage`](skills/polish-film-heritage/SKILL.md) | Dziedzictwo filmowe i fotograficzne | Ninateka, Gapla, Fototeka, FilmPolski.pl, Fototeka Śląska, Repozytorium FN |
+| [`polish-educational-resources`](skills/polish-educational-resources/SKILL.md) | Otwarte podręczniki szkolne K-12 | epodreczniki.pl (ORE/MEN) |
 
 Każdy folder skilla zawiera `SKILL.md` (opis + instrukcje dla agenta),
 `scripts/` (skrypty CLI) i często `reference/API.md` (szczegóły parametrów,
 dla tych, które byłyby zbyt długie w `SKILL.md`).
+
+**Przeszukiwanie wszystkich źródeł naraz:** sześć skilli z więcej niż jednym
+źródłem (`polish-academic-repositories`, `polish-culture-archives`,
+`polish-film-heritage`, `polish-legal-normative-documents`,
+`polish-open-data-statistics`, `polish-science-bibliography`) ma skrypt
+`scripts/search_all.py`, który odpytuje równolegle wszystkie źródła danego
+skilla dla jednego zapytania i zwraca połączony JSON — `SKILL.md` każdego z
+nich jawnie instruuje agenta, żeby dla szerokich zapytań użył najpierw
+właśnie tego skryptu, zamiast poprzestawać na pierwszym trafionym źródle.
 
 ---
 
@@ -61,7 +71,7 @@ dla tych, które byłyby zbyt długie w `SKILL.md`).
 To repo jest jednocześnie **marketplace pluginów** Claude Code
 (`.claude-plugin/marketplace.json`). Każdy skill jest osobnym pluginem, więc
 możesz zainstalować tylko te, których potrzebujesz, plus jeden plugin-zbiorczy
-z wszystkimi siedmioma naraz.
+z wszystkimi ośmioma naraz.
 
 ```bash
 # 1) Dodaj marketplace (raz)
@@ -70,7 +80,7 @@ claude plugin marketplace add asterixix/polish-academic-skills
 # 2) Zainstaluj wybrany skill jako plugin
 claude plugin install polish-weather-hydrology@polish-academic-skills
 
-# ...albo wszystkie 7 naraz jednym pluginem
+# ...albo wszystkie 8 naraz jednym pluginem
 claude plugin install polish-academic-skills-all@polish-academic-skills
 ```
 
@@ -81,7 +91,8 @@ nazwy pluginów (`<nazwa>@polish-academic-skills`):
 `polish-academic-repositories`, `polish-science-bibliography`,
 `polish-open-data-statistics`, `polish-weather-hydrology`,
 `polish-legal-normative-documents`, `polish-culture-archives`,
-`polish-film-heritage`, oraz zbiorczy `polish-academic-skills-all`.
+`polish-film-heritage`, `polish-educational-resources`, oraz zbiorczy
+`polish-academic-skills-all`.
 
 Aktualizacja po zmianach w repo: `claude plugin marketplace update polish-academic-skills`
 (albo `claude plugin update <nazwa-pluginu>`).
@@ -167,6 +178,19 @@ udostępnia publicznego JSON API i skrypty parsują HTML — to z natury bardzie
 kruche niż wywołanie REST i może się zepsuć przy zmianie layoutu strony.
 Szczegóły i status poszczególnych źródeł (np. katalogi nieaktualizowane od
 lat) są opisane w `SKILL.md` odpowiedniego skilla.
+
+`ppm.py` (`polish-academic-repositories`) ma nie w pełni zweryfikowany
+adres bazowy OAI-PMH — patrz docstring skryptu i uruchom `identify` przed
+`search`/`get`.
+
+**Źródła celowo pominięte na razie** (brak potwierdzonego publicznego API,
+tylko nieudokumentowany scraping HTML formularzy, których nie dało się
+przetestować na żywo z tego środowiska): academica.edu.pl, infona.pl,
+emis.icm.edu.pl, bgbase.up.krakow.pl (system Expertus), chmuraczytania.pl,
+ofiary.ipn.gov.pl, powstania.pilsudski.org, głębsza integracja z
+archiwa.gov.pl/szukajwarchiwach.gov.pl. Dodanie ich wymaga realnych
+requestów (curl / devtools) z działającego środowiska, żeby nie zgadywać
+nazw pól formularzy.
 
 ## Źródło i licencja
 

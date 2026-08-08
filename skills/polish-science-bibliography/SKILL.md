@@ -1,6 +1,6 @@
 ---
 name: polish-science-bibliography
-description: Query Polish science-bureaucracy and bibliography data - publication and researcher records in PBN (Polska Bibliografia Naukowa), open higher-education/institution datasets from POL-on / RAD-on, and researcher profiles from Ludzie Nauki (ORCID, degrees, keywords). Use when the user asks about Polish scientific publications, PBN, POL-on, RAD-on, uczelnie, pracownicy naukowi, granty/projekty naukowe, naukowcy, badacze, ORCID, publikacje naukowe, or scientist/institution lookups tied to Polish public science registries. PBN tools require registered API credentials; POL-on/RAD-on and Ludzie Nauki are open, no key needed.
+description: Query Polish science-bureaucracy and bibliography data - publication and researcher records in PBN (Polska Bibliografia Naukowa), open higher-education/institution datasets from POL-on / RAD-on, and researcher profiles from Ludzie Nauki (ORCID, degrees, keywords) -- Ludzie Nauki is the successor to nauka-polska.pl, which now redirects here. IMPORTANT -- for any broad "find this publication or researcher" search, run `scripts/search_all.py --query X` first: it fans the query out to PBN and Ludzie Nauki in parallel. Use when the user asks about Polish scientific publications, PBN, POL-on, RAD-on, nauka-polska, uczelnie, pracownicy naukowi, granty/projekty naukowe, naukowcy, badacze, ORCID, publikacje naukowe, or scientist/institution lookups tied to Polish public science registries. PBN tools require registered API credentials; POL-on/RAD-on and Ludzie Nauki are open, no key needed.
 ---
 
 # Polish Science Bibliography
@@ -20,10 +20,30 @@ three Polish public/science-bureaucracy data sources:
 
 No MCP server, no pip installs. Run the scripts directly with `python3`.
 
+**Note on nauka-polska.pl:** the historic Nauka Polska portal now redirects
+to `ludzie.nauka.gov.pl` and is archival-only -- `ludzie_nauki.py` already
+covers it, no separate script is needed.
+
+## Search across every source at once
+
+For any broad "find this publication or researcher" query, run
+**`scripts/search_all.py --query "..."`** first. It fans the query out in
+parallel to `pbn.py search-publications --title` and `ludzie_nauki.py
+semantic-search --full-query`, returning one combined JSON. PBN errors
+cleanly (and search_all reports it as a per-source failure) if
+`PBN_APP_ID`/`PBN_APP_TOKEN` aren't set. POL-on/RAD-on is structured-filter
+only (institution/employee/project/publication fields, no free text) --
+call `polon.py` directly instead.
+
+```bash
+python3 scripts/search_all.py --query "Magdalena Wójcik"
+```
+
 ## Scripts and subcommands
 
 | Script | Subcommand | Mirrors original tool | Endpoint |
 | --- | --- | --- | --- |
+| `scripts/search_all.py` | `--query` | *(new -- not from the MCP port)* | Fans out to PBN + Ludzie Nauki in parallel |
 | `scripts/pbn.py` | `search-publications` | `pbn_search_publications` | `POST /v1/search/publications` |
 | `scripts/pbn.py` | `search-persons` | `pbn_search_persons` | `POST /v1/search/persons` |
 | `scripts/pbn.py` | `get-publication` | `pbn_get_publication` | `GET /v1/publications/id/{id}` |

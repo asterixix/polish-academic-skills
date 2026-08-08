@@ -1,6 +1,6 @@
 ---
 name: polish-open-data-statistics
-description: Search and fetch Polish government open data and official regional statistics without an MCP server. Covers dane.gov.pl (dane otwarte, the national open data portal) and GUS's Bank Danych Lokalnych / BDL (statystyka publiczna, TERYT territorial units, województwa, wskaźniki statystyczne, demografia, ludność). Use for "open data Poland", "GUS statistics", "local data bank", "dane.gov.pl", "BDL", "statystyka regionalna".
+description: Search and fetch Polish government open data and official regional statistics without an MCP server. Covers dane.gov.pl (dane otwarte, the national open data portal) and GUS's Bank Danych Lokalnych / BDL (statystyka publiczna, TERYT territorial units, województwa, wskaźniki statystyczne, demografia, ludność) -- BDL is the machine-readable API behind stat.gov.pl's own published figures. IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to both sources in parallel. Use for "open data Poland", "GUS statistics", "local data bank", "dane.gov.pl", "BDL", "stat.gov.pl", "statystyka regionalna".
 ---
 
 # Polish Open Data & Statistics
@@ -15,9 +15,28 @@ runs with the Python 3 standard library (`urllib`, `json`, `argparse`).
 | Source | What it is | Base URL |
 |---|---|---|
 | **dane.gov.pl** | Poland's national open data portal: 43,000+ datasets from 500+ public institutions (ministries, local government, agencies). No API key. | `https://api.dane.gov.pl/1.4` |
-| **BDL (Bank Danych Lokalnych)** | GUS (Statistics Poland) regional/national statistics database: subjects, variables, territorial units (TERYT), and time-series data values. Works anonymously; optional client id for higher rate limits. | `https://bdl.stat.gov.pl/api/v1` |
+| **BDL (Bank Danych Lokalnych)** | GUS (Statistics Poland) regional/national statistics database: subjects, variables, territorial units (TERYT), and time-series data values. Works anonymously; optional client id for higher rate limits. This is the machine-readable API behind the figures published on the main **stat.gov.pl** site -- there is no separate general-purpose API for stat.gov.pl itself. | `https://bdl.stat.gov.pl/api/v1` |
+
+## Search across every source at once
+
+For any broad topic query, run **`scripts/search_all.py --query "..."`**
+first. It fans the query out in parallel to dane.gov.pl (full-text dataset
+search) and BDL (subject-tree name match), returning one combined JSON.
+BDL's result is only the first hop -- a matching subject id -- drill into
+`bdl.py search-variables --subject-id <id>` and then `data-by-variable` to
+get actual statistics.
+
+```bash
+python3 scripts/search_all.py --query "ludność"
+```
 
 ## Scripts
+
+### `scripts/search_all.py` -- cross-source fan-out *(new -- not from the MCP port)*
+
+Runs `dane_gov_pl.py search` and `bdl.py search-subjects` as parallel
+subprocesses and merges their JSON output. See "Search across every source
+at once" above.
 
 ### `scripts/dane_gov_pl.py`
 

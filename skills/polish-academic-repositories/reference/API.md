@@ -326,6 +326,77 @@ instead and returns `{"requested_format", "fallback_format":
 
 ---
 
+## Depot CeON (`scripts/depot_ceon.py`)
+
+Base URL: `https://depot.ceon.pl/oai/request` (OAI-PMH 2.0, standard DSpace
+path). Repository of Centre for Open Science (CeON), ICM University of
+Warsaw -- journal articles, books, chapters, theses/dissertations,
+conference materials, reports. Metadata harvesting only; no DSpace REST API
+has been confirmed publicly documented for this installation (unlike
+RUJ/AGH/AMU/UAFM/ICM above), so there is no free-text `search`.
+
+### `search` (ListRecords)
+
+| Flag | Type | Default | Notes |
+|---|---|---|---|
+| `--from-date` / `--until-date` | `YYYY-MM-DD` | none | |
+| `--set` | string | none | OAI setSpec, e.g. `col_123456789_58`. Omit for all sets. |
+| `--metadata-format` | `oai_dc` | `oai_dc` | Only format confirmed supported. |
+| `--resumption-token` | string | none | Continue a previous harvest. |
+
+### `get` (GetRecord)
+
+| Flag | Type | Default | Notes |
+|---|---|---|---|
+| `--id` | string | required | Handle suffix (e.g. `123456789/12345`) or full OAI identifier. |
+| `--metadata-format` | `oai_dc` | `oai_dc` | |
+
+---
+
+## PPM -- Polska Platforma Medyczna (`scripts/ppm.py`)
+
+Base URL: `https://ppm.edu.pl:7443/oaicat/` (OAI-PMH 2.0, OCLC OAICat
+implementation) -- **unverified**, found via web search only, not live-tested
+from this environment. A joint CRIS repository run by 7 Polish medical
+universities plus 1 research institute. Metadata harvesting only, no
+free-text search confirmed public.
+
+### `identify`
+
+No flags. Cheap OAI `Identify` sanity check -- run this before `search`/`get`
+to confirm the base URL actually resolves; if it 404s, edit `OAI_BASE` in the
+script to `https://ppm.edu.pl:7443/oaicat/OAIHandler` (the conventional
+OAICat servlet mapping) and try again.
+
+### `search` (ListRecords)
+
+| Flag | Type | Default | Notes |
+|---|---|---|---|
+| `--from-date` / `--until-date` | `YYYY-MM-DD` | none | |
+| `--set` | string | none | OAI setSpec. Run `identify`/inspect a raw `ListSets` call to discover valid values. |
+| `--metadata-format` | `oai_dc` | `oai_dc` | Only format assumed supported. |
+| `--resumption-token` | string | none | Continue a previous harvest. |
+
+### `get` (GetRecord)
+
+| Flag | Type | Default | Notes |
+|---|---|---|---|
+| `--id` | string | required | Full OAI identifier, from a prior `search`'s `identifier` field. |
+| `--metadata-format` | `oai_dc` | `oai_dc` | |
+
+---
+
+## search_all.py -- cross-source fan-out
+
+Not a source wrapper -- runs several of the scripts above as parallel
+subprocesses and merges their JSON output. See "Search across every source
+at once" in `SKILL.md` for usage. Sources included: `biblioteka_nauki`
+(`search-publications`), `ruj`, `agh`, `amu`, `uafm`, `icm` (all `search`),
+`repod`, `rodbuk` (both `search`). Excluded (OAI-PMH only, no query param):
+`rcin`, `depot_ceon`, `ppm`, `biblioteka_nauki search-articles`.
+
+---
+
 ## Judgment calls made while porting
 
 The original MCP tools for the OAI-PMH sources (Biblioteka Nauki's
