@@ -20,6 +20,7 @@ and open research-data repositories:
 - **RePOD** -- ICM Warsaw open research-data repository.
 - **Depot CeON** -- Repozytorium Centrum Otwartej Nauki (ICM University of Warsaw), OAI-PMH only.
 - **PPM** -- Polska Platforma Medyczna, a joint CRIS repository of 7 medical universities + 1 institute, OAI-PMH only.
+- **EMIS/ELibM** -- European Mathematical Information Service / Electronic Library of Mathematics, a static browsable index of 100+ open-access math journals/proceedings/books (no search, no query -- category browsing only).
 
 Use this skill when someone wants to find Polish theses, dissertations,
 journal articles, book chapters, or open research datasets, or needs to
@@ -99,7 +100,9 @@ Every command prints a JSON object to stdout on success, or a clear
 | `ppm.py` | `identify` | PPM | OAI-PMH `Identify` -- cheap sanity check; run before `search`/`get` since the base URL is unverified (see script docstring). |
 | `ppm.py` | `search` | PPM | OAI-PMH `ListRecords` -- harvest by date range and/or OAI setSpec. No keyword query. |
 | `ppm.py` | `get` | PPM | OAI-PMH `GetRecord` -- single object by full OAI identifier. |
-| `search_all.py` | *(n/a)* | all of the above | Fans one `--query` out to every free-text source in parallel. See "Search across every source at once" above. |
+| `emis.py` | `categories` | EMIS/ELibM | List the 6 fixed top-level categories (no network request). |
+| `emis.py` | `browse` | EMIS/ELibM | Fetch one category's index page and list every link on it. Confirmed live: no search/query exists on this site. |
+| `search_all.py` | *(n/a)* | all of the above except EMIS | Fans one `--query` out to every free-text source in parallel. See "Search across every source at once" above. |
 
 Full per-parameter reference (all filter fields, default operators,
 sort options, metadata formats) is in [`reference/API.md`](reference/API.md)
@@ -338,6 +341,7 @@ marks the response with `"fallback_format": "dataverse_json"`.
 - RePOD: https://repod.icm.edu.pl (REST: `/api`)
 - Depot CeON: https://depot.ceon.pl (OAI-PMH: `/oai/request`)
 - PPM: https://ppm.edu.pl (OAI-PMH: `ppm.edu.pl:7443/oaicat/`, base URL unverified -- see `ppm.py` docstring)
+- EMIS/ELibM: http://emis.icm.edu.pl (static site, confirmed live: no API, no search)
 
 ## Attribution
 

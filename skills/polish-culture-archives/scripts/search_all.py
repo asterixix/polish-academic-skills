@@ -4,10 +4,11 @@ Fan out one query across every free-text-searchable source in this skill and
 return combined results in a single JSON document.
 
 USE THIS FIRST for any broad "find X in Polish cultural heritage archives"
-question -- it queries BazTOL, Baza Legalnych Zrodel (BLZ), NAC, PAUart, and
-Katalog SUM (Aleph) in parallel so nothing gets missed just because only one
-source was tried. Call an individual script directly only once you already
-know which single source has the answer.
+question -- it queries BazTOL, Baza Legalnych Zrodel (BLZ), NAC, PAUart,
+Katalog SUM (Aleph), Centrum Informacji o Ofiarach II WS (IPN), and
+EDUKATOR (bgbase.up.krakow.pl) in parallel so nothing gets missed just
+because only one source was tried. Call an individual script directly only
+once you already know which single source has the answer.
 
 NOT included (no free-text query concept -- call these directly):
   dokumenty_slaska.py  -- fixed-path document series browsing, not searchable by keyword.
@@ -33,6 +34,8 @@ def build_jobs(args: argparse.Namespace) -> dict[str, list[str]]:
         "nac": ["site-search", "--query", args.query],
         "pauart": ["search", "--query", args.query],
         "sum_aleph": ["find", "--base", args.sum_base, "--request", f"wrd={args.query}"],
+        "ofiary_ipn": ["search", "--query", args.query],
+        "bgbase_edu": ["search", "--query1", args.query],
     }
 
 

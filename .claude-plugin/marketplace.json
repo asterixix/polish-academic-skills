@@ -11,14 +11,14 @@
       "source": "./",
       "skills": ["./skills/polish-academic-repositories"],
       "strict": false,
-      "description": "Search and fetch metadata from Polish academic institutional repositories and open research-data repositories: Biblioteka Nauki, RCIN, RUJ, AGH, AMU, UAFM, ICM Open, RODBuK, RePOD, Depot CeON, and PPM. Includes search_all.py to query every free-text source at once.",
-      "version": "1.1.0",
+      "description": "Search and fetch metadata from Polish academic institutional repositories and open research-data repositories: Biblioteka Nauki, RCIN, RUJ, AGH, AMU, UAFM, ICM Open, RODBuK, RePOD, Depot CeON, PPM, and EMIS/ELibM. Includes search_all.py to query every free-text source at once.",
+      "version": "1.2.0",
       "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
       "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-academic-repositories",
       "repository": "https://github.com/asterixix/polish-academic-skills",
       "license": "MIT",
       "category": "research",
-      "keywords": ["poland", "academic", "repository", "publications", "research-data", "oai-pmh", "rcin", "ruj", "agh", "amu", "repod", "depot-ceon", "ppm"]
+      "keywords": ["poland", "academic", "repository", "publications", "research-data", "oai-pmh", "rcin", "ruj", "agh", "amu", "repod", "depot-ceon", "ppm", "emis"]
     },
     {
       "name": "polish-science-bibliography",
@@ -81,14 +81,14 @@
       "source": "./",
       "skills": ["./skills/polish-culture-archives"],
       "strict": false,
-      "description": "Query Polish cultural-heritage archives and catalogs: Baza Legalnych Zrodel, BazTOL, NAC (National Digital Archive), Katalog Biblioteki SUM (Aleph), PAUart, Wolne Lektury, and Dokumenty Slaska. Includes search_all.py to query the free-text sources at once.",
-      "version": "1.1.0",
+      "description": "Query Polish cultural-heritage archives and catalogs: Baza Legalnych Zrodel, BazTOL, NAC (National Digital Archive), Katalog Biblioteki SUM (Aleph), PAUart, Wolne Lektury, Dokumenty Slaska, Centrum Informacji o Ofiarach II WS (IPN), and EDUKATOR. Includes search_all.py to query the free-text sources at once.",
+      "version": "1.2.0",
       "author": { "name": "Artur Sendyka", "url": "https://github.com/asterixix" },
       "homepage": "https://github.com/asterixix/polish-academic-skills/tree/main/skills/polish-culture-archives",
       "repository": "https://github.com/asterixix/polish-academic-skills",
       "license": "MIT",
       "category": "culture",
-      "keywords": ["poland", "culture", "archives", "nac", "wolne-lektury", "digital-heritage"]
+      "keywords": ["poland", "culture", "archives", "nac", "wolne-lektury", "digital-heritage", "ipn", "edukator"]
     },
     {
       "name": "polish-film-heritage",

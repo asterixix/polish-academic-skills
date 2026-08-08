@@ -25,12 +25,12 @@ asterixix/polish-academic-skills`, patrz [Instalacja](#instalacja).
 
 | Skill | Zakres | Źródła |
 | --- | --- | --- |
-| [`polish-academic-repositories`](skills/polish-academic-repositories/SKILL.md) | Repozytoria naukowe uczelni i dane badawcze | Biblioteka Nauki, RCIN, RUJ (UJ), AGH, AMU (UAM), UAFM, ICM Open, RODBuK, RePOD, Depot CeON, PPM |
+| [`polish-academic-repositories`](skills/polish-academic-repositories/SKILL.md) | Repozytoria naukowe uczelni i dane badawcze | Biblioteka Nauki, RCIN, RUJ (UJ), AGH, AMU (UAM), UAFM, ICM Open, RODBuK, RePOD, Depot CeON, PPM, EMIS/ELibM |
 | [`polish-science-bibliography`](skills/polish-science-bibliography/SKILL.md) | Bibliografia naukowa i profile badaczy | PBN, POL-on/RAD-on, Ludzie Nauki (następca nauka-polska.pl) |
 | [`polish-open-data-statistics`](skills/polish-open-data-statistics/SKILL.md) | Dane otwarte i statystyka publiczna | dane.gov.pl, BDL/GUS (w tym dane ze stat.gov.pl) |
 | [`polish-weather-hydrology`](skills/polish-weather-hydrology/SKILL.md) | Pogoda i hydrologia w czasie rzeczywistym | IMGW-PIB |
 | [`polish-legal-normative-documents`](skills/polish-legal-normative-documents/SKILL.md) | Akty prawne, orzeczenia sądów, normy | ISAP/ELI, Biblioteka Sejmowa, SAOS, PKN, WIEDZA-PKN |
-| [`polish-culture-archives`](skills/polish-culture-archives/SKILL.md) | Dziedzictwo kulturowe i archiwa | Baza Legalnych Źródeł, BazTOL, NAC, Katalog ŚUM (Aleph), PAUart, Wolne Lektury, Dokumenty Śląska |
+| [`polish-culture-archives`](skills/polish-culture-archives/SKILL.md) | Dziedzictwo kulturowe i archiwa | Baza Legalnych Źródeł, BazTOL, NAC, Katalog ŚUM (Aleph), PAUart, Wolne Lektury, Dokumenty Śląska, Ofiary IPN, EDUKATOR |
 | [`polish-film-heritage`](skills/polish-film-heritage/SKILL.md) | Dziedzictwo filmowe i fotograficzne | Ninateka, Gapla, Fototeka, FilmPolski.pl, Fototeka Śląska, Repozytorium FN |
 | [`polish-educational-resources`](skills/polish-educational-resources/SKILL.md) | Otwarte podręczniki szkolne K-12 | epodreczniki.pl (ORE/MEN) |
 
@@ -183,14 +183,31 @@ lat) są opisane w `SKILL.md` odpowiedniego skilla.
 adres bazowy OAI-PMH — patrz docstring skryptu i uruchom `identify` przed
 `search`/`get`.
 
-**Źródła celowo pominięte na razie** (brak potwierdzonego publicznego API,
-tylko nieudokumentowany scraping HTML formularzy, których nie dało się
-przetestować na żywo z tego środowiska): academica.edu.pl, infona.pl,
-emis.icm.edu.pl, bgbase.up.krakow.pl (system Expertus), chmuraczytania.pl,
-ofiary.ipn.gov.pl, powstania.pilsudski.org, głębsza integracja z
-archiwa.gov.pl/szukajwarchiwach.gov.pl. Dodanie ich wymaga realnych
-requestów (curl / devtools) z działającego środowiska, żeby nie zgadywać
-nazw pól formularzy.
+`ofiary_ipn.py` i `bgbase_edu.py` (`polish-culture-archives`) mają
+potwierdzone na żywo nazwy pól formularzy i endpointy, ale nie widziano
+jeszcze strony z realnymi trafieniami (tylko pustą stronę wyszukiwania /
+"brak wyników") — struktura pojedynczego rekordu w wynikach nie jest
+jeszcze sparsowana, skrypty zawsze zwracają też surowy HTML. `emis.py`
+(`polish-academic-repositories`) to czysty katalog statyczny — potwierdzono
+na żywo, że nie ma tam żadnego wyszukiwania ani API.
+
+**`archiwa.gov.pl` / `szukajwarchiwach.gov.pl` — sprawdzone i odrzucone.**
+Oba adresy są za Incapsula (WAF przeciw botom) na poziomie HTTP, nie tylko
+JS w przeglądarce — nawet zwykły `curl`/`Invoke-WebRequest` dostaje pustą
+stronę z wyzwaniem `_Incapsula_Resource` zamiast treści. Obejście wymaga
+prawdziwej przeglądarki (headless) wykonującej JS, co łamie założenie tego
+projektu "tylko biblioteka standardowa, zero zależności" — nie będzie tu
+zaimplementowane, chyba że ktoś zaakceptuje dodanie takiej zależności.
+
+**Źródła nadal czekające na kolejną rundę testów na żywo** (brak
+potwierdzonego publicznego API lub pierwsza próba nie dała jednoznacznej
+odpowiedzi): academica.edu.pl (błąd cookie w PowerShell — spróbuj przez
+`curl.exe` albo devtools), infona.pl (strona bez `<form>` — wyszukiwanie
+idzie przez JS, potrzebne "Copy as cURL" z devtools), chmuraczytania.pl
+(formularz wyszukiwania nie jest na stronie głównej — sprawdź
+`catalog.php`), powstania.pilsudski.org (strona `/osoby` ma ~3.5 MB, trzeba
+z niej wyciągnąć fragment z `<form>` albo sprawdzić `js/ajax_req.js` pod
+kątem wywołań AJAX/fetch).
 
 ## Źródło i licencja
 

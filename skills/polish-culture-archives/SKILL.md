@@ -1,17 +1,20 @@
 ---
 name: polish-culture-archives
-description: Query Polish cultural heritage, archives, and reference catalogs - Baza Legalnych Zrodel (legal digital-culture sources directory), BazTOL (technical-science web gateway, stale since 2022), NAC / Narodowe Archiwum Cyfrowe (National Digital Archive news + WordPress content), Katalog Biblioteki SUM (medical-university Aleph library catalog), PAUart (PAU fine-arts catalog), Wolne Lektury (free ebook library of Polish literature), and Dokumenty Slaska (static historical-documents site). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to every free-text-searchable source in this skill in parallel. Use when the user asks about Polish cultural heritage, digital archives, archiwa cyfrowe, dziedzictwo kulturowe, legalne zrodla kultury, BazTOL, NAC, National Digital Archive, katalog biblioteczny Aleph, PAUart, dziela sztuki, Wolne Lektury, wolne lektury, free ebooks Polish literature, biblioteka cyfrowa, or medieval Silesian documents. No API keys needed for any of these sources.
+description: Query Polish cultural heritage, archives, and reference catalogs - Baza Legalnych Zrodel (legal digital-culture sources directory), BazTOL (technical-science web gateway, stale since 2022), NAC / Narodowe Archiwum Cyfrowe (National Digital Archive news + WordPress content), Katalog Biblioteki SUM (medical-university Aleph library catalog), PAUart (PAU fine-arts catalog), Wolne Lektury (free ebook library of Polish literature), Dokumenty Slaska (static historical-documents site), Centrum Informacji o Ofiarach II Wojny Swiatowej / IPN (WWII victims database), and EDUKATOR (Pedagogical University of Krakow staff bibliography). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to every free-text-searchable source in this skill in parallel. Use when the user asks about Polish cultural heritage, digital archives, archiwa cyfrowe, dziedzictwo kulturowe, legalne zrodla kultury, BazTOL, NAC, National Digital Archive, katalog biblioteczny Aleph, PAUart, dziela sztuki, Wolne Lektury, wolne lektury, free ebooks Polish literature, biblioteka cyfrowa, medieval Silesian documents, ofiary wojny, IPN, druga wojna swiatowa, or bibliografia pracownikow uczelni. No API keys needed for any of these sources.
 ---
 
 # Polish Culture Archives
 
 Standalone, dependency-free Python 3 scripts (standard library only) for
-seven Polish cultural-heritage and reference sources. No API keys are
-needed anywhere in this skill. Ported from the `polish-academic-mcp` MCP
-server's tools of the same names, with the MCP layer and Cloudflare KV
-caching stripped out so each script runs as a plain CLI.
+nine Polish cultural-heritage and reference sources. No API keys are
+needed anywhere in this skill. Seven were ported from the
+`polish-academic-mcp` MCP server's tools of the same names, with the MCP
+layer and Cloudflare KV caching stripped out so each script runs as a plain
+CLI; two (`ofiary_ipn.py`, `bgbase_edu.py`) were added directly to this
+skill based on live-verified HTML form dumps (see their docstrings for what
+was actually confirmed against the real server vs. best-effort).
 
-## The 7 sources at a glance
+## The 9 sources at a glance
 
 | Source | What it is | Format | Notes |
 |---|---|---|---|
@@ -22,17 +25,20 @@ caching stripped out so each script runs as a plain CLI.
 | **PAUart** | Fine-arts catalog of the Polish Academy of Arts and Sciences (PAU) | JSON (Collectio/Elasticsearch) | |
 | **Wolne Lektury** | Free ebook library of (mostly public-domain) Polish literature | JSON (official API) | No full-text search; filter by taxonomy instead |
 | **Dokumenty Slaska** | Static site of medieval Silesian documents, regesty, heraldry | HTML (static pages) | No API, no search; fixed navigation list only |
+| **Centrum Informacji o Ofiarach II WS** (IPN) | WWII victims/records database, `ofiary.ipn.gov.pl` | HTML (POSTs the real search form) | Field names confirmed live; the shape of a *populated* results page is not yet confirmed (see script docstring) |
+| **EDUKATOR** (bgbase.up.krakow.pl) | Staff/doctoral-student publication bibliography, Pedagogical University of Krakow | HTML (Expertus CGI, iso-8859-2) | Query confirmed working live (verified "no results" response); populated-results shape not yet confirmed |
 
 ## Search across every source at once
 
 For any broad topic query, don't stop at the first source that answers --
 run **`scripts/search_all.py --query "..."`** first. It fans the query out
-in parallel to BazTOL, BLZ, NAC, PAUart, and Katalog SUM (everything with a
-real free-text search) and returns one combined JSON with a `results`
-object keyed by source. Per-source failures (including Katalog SUM's known
-SRU-gate outage) never abort the others. Wolne Lektury and Dokumenty Slaska
-are taxonomy/path-browsing only (no keyword query) and are listed
-separately in the aggregator's output -- call them directly instead.
+in parallel to BazTOL, BLZ, NAC, PAUart, Katalog SUM, Centrum Informacji o
+Ofiarach II WS (IPN), and EDUKATOR (everything with a real free-text
+search) and returns one combined JSON with a `results` object keyed by
+source. Per-source failures (including Katalog SUM's known SRU-gate
+outage) never abort the others. Wolne Lektury and Dokumenty Slaska are
+taxonomy/path-browsing only (no keyword query) and are listed separately
+in the aggregator's output -- call them directly instead.
 
 ```bash
 python3 scripts/search_all.py --query "Śląsk"
@@ -70,7 +76,9 @@ stderr and exits 1.
 | `wolne_lektury.py` | `get-collection --slug` | `wolnelektury_get_collection` |
 | `dokumenty_slaska.py` | `get-page --path` | `dokumenty_slaska_get_page` |
 | `dokumenty_slaska.py` | `medieval-catalog` | `dokumenty_slaska_medieval_catalog` |
-| `search_all.py` | `--query --sum-base` | *(new -- not from the MCP port)* Fans one query out to BazTOL, BLZ, NAC, PAUart, and Katalog SUM in parallel. |
+| `ofiary_ipn.py` | `search --query --scope --exact-phrase --exclude-words --or-term1/2/3 --date-from --date-to --category` | *(new -- not from the MCP port)* POSTs the real search form on ofiary.ipn.gov.pl. |
+| `bgbase_edu.py` | `search --query1 --field1 --query2 --field2 --query3 --field3 --combine --sort --format --page-size` | *(new -- not from the MCP port)* GETs the EDUKATOR Expertus CGI (Uniwersytet Pedagogiczny w Krakowie). |
+| `search_all.py` | `--query --sum-base` | *(new -- not from the MCP port)* Fans one query out to BazTOL, BLZ, NAC, PAUart, Katalog SUM, ofiary_ipn, and bgbase_edu in parallel. |
 
 Gnarly per-source parsing/parameter details (exact request bodies, XML
 shapes, domain id tables, path-validation algorithm) are in
@@ -156,6 +164,8 @@ python3 scripts/dokumenty_slaska.py get-page --path "indeks 1200.html"
 - PAUart: http://www.pauart.pl/app
 - Wolne Lektury: https://wolnelektury.pl/api/
 - Dokumenty Slaska: https://www.dokumentyslaska.pl/
+- Centrum Informacji o Ofiarach II WS (IPN): https://ofiary.ipn.gov.pl/ofi/search
+- EDUKATOR (bgbase.up.krakow.pl): http://bgbase.up.krakow.pl/biblio/bibliografia/index.php?base=edu
 
 ## Attribution
 
