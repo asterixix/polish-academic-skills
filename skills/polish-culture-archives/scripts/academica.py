@@ -42,7 +42,9 @@ import urllib.parse
 import urllib.request
 from html.parser import HTMLParser
 
-USER_AGENT = "polish-academic-skills/1.0 (+https://github.com/asterixix/polish-academic-skills)"
+import _http  # noqa: F401 -- imported only so stdout/stderr switch to UTF-8 (see _http.py)
+
+USER_AGENT ="polish-academic-skills/1.0 (+https://github.com/asterixix/polish-academic-skills)"
 TIMEOUT = 30
 SITE = "https://academica.edu.pl"
 

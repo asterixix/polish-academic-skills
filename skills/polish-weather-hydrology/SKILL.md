@@ -1,6 +1,8 @@
 ---
 name: polish-weather-hydrology
 description: Fetches real-time Polish weather, hydrology, and warnings data from IMGW-PIB (danepubliczne.imgw.pl) with no API key required. Use for current synoptic/weather station readings, river gauge (hydrological) station data, meteorological station readings, and active meteorological or flood warnings in Poland. Keywords -- IMGW, weather stations Poland, hydrological data, flood warnings, pogoda w Polsce, stacje meteorologiczne, ostrzeżenia meteorologiczne, wodowskazy, poziom wody, stacje synoptyczne, dane hydrologiczne.
+license: MIT
+compatibility: Requires Python 3.9+ (standard library only, nothing to install) and outbound HTTPS access to danepubliczne.imgw.pl.
 ---
 
 # Polish Weather & Hydrology (IMGW-PIB)
@@ -21,6 +23,24 @@ hour by IMGW-PIB. Source: https://danepubliczne.imgw.pl
 
 All scripts are standard-library-only Python 3 (`urllib`, `json`, `argparse`)
 — no dependencies to install.
+
+## Running the scripts
+
+- Every `scripts/...` path in this file is relative to **this skill's own
+  folder** (the directory that contains this `SKILL.md`), not to the user's
+  project. Call a script by its full path, e.g.
+  `python3 /path/to/polish-weather-hydrology/scripts/imgw.py synop`, or `cd` into the skill
+  folder first.
+- Use `python3` on macOS/Linux. On Windows use `python` (or `py -3`) when
+  `python3` is not found. Python 3.9+ and its standard library are all that
+  is needed -- do not `pip install` anything.
+- Results are UTF-8 JSON on stdout; errors go to stderr with a non-zero exit
+  code. Summarize results for the user in plain language (the key fields
+  plus a source link) instead of pasting raw JSON, unless they ask for it.
+- The scripts need internet access to `danepubliczne.imgw.pl`. If every call fails with a
+  network, proxy, or HTTP 403 error, outbound traffic is being blocked (for
+  example by the network-egress setting on claude.ai / Claude Desktop) --
+  tell the user which domains to allow instead of retrying.
 
 ## Scripts
 

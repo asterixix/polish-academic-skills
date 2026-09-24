@@ -10,7 +10,8 @@ integration on the test environment:
   https://pbn.nauka.gov.pl/centrum-pomocy/open-api-w-wersji-produkcyjnej-pbn/
   https://pbn.nauka.gov.pl/centrum-pomocy/baza-wiedzy/sposob-uzyskania-dostepu-do-api-w-wersji-produkcyjnej/
 
-Reads credentials from the environment:
+Reads credentials from the environment, or from a polish-academic-skills.env
+file (KEY=value lines) in this skill's folder or the home folder:
   PBN_APP_ID     (required)
   PBN_APP_TOKEN  (required)
   PBN_USER_TOKEN (optional, for operations needing a user context)
@@ -25,27 +26,28 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 import urllib.parse
 
-from _http import fail, print_result, prune, request
+from _http import fail, get_setting, print_result, prune, request
 
 API_BASE = "https://pbn.nauka.gov.pl/api/v1"
 
 PBN_ACCESS_HELP = (
-    "PBN API requires PBN_APP_ID and PBN_APP_TOKEN environment variables "
-    "(optionally PBN_USER_TOKEN for user-context operations).\n"
+    "PBN API requires PBN_APP_ID and PBN_APP_TOKEN (optionally PBN_USER_TOKEN "
+    "for user-context operations), set as environment variables or as KEY=value "
+    "lines in a polish-academic-skills.env file in this skill's folder or your "
+    "home folder.\n"
     "Get access: https://pbn.nauka.gov.pl/centrum-pomocy/open-api-w-wersji-produkcyjnej-pbn/\n"
     "Details: https://pbn.nauka.gov.pl/centrum-pomocy/baza-wiedzy/sposob-uzyskania-dostepu-do-api-w-wersji-produkcyjnej/"
 )
 
 
 def require_pbn_headers(with_json_body: bool) -> dict:
-    """Build PBN auth headers from the environment, or fail(1) with a clear
+    """Build PBN auth headers from get_setting(), or fail(1) with a clear
     message BEFORE any network call is attempted."""
-    app_id = (os.environ.get("PBN_APP_ID") or "").strip()
-    app_token = (os.environ.get("PBN_APP_TOKEN") or "").strip()
+    app_id = get_setting("PBN_APP_ID")
+    app_token = get_setting("PBN_APP_TOKEN")
     if not app_id or not app_token:
         fail(PBN_ACCESS_HELP)
 
@@ -56,7 +58,7 @@ def require_pbn_headers(with_json_body: bool) -> dict:
     }
     if with_json_body:
         headers["Content-Type"] = "application/json"
-    user_token = (os.environ.get("PBN_USER_TOKEN") or "").strip()
+    user_token = get_setting("PBN_USER_TOKEN")
     if user_token:
         headers["X-User-Token"] = user_token
     return headers

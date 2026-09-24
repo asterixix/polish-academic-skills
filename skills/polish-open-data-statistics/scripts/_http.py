@@ -15,9 +15,28 @@ Network policy (mirrors the source MCP server's cache.ts):
 from __future__ import annotations
 
 import json
+import os
+import sys
 import urllib.error
 import urllib.request
+from pathlib import Path
 from typing import Any, Dict, Optional
+
+
+def _use_utf8_stdio() -> None:
+    """Always write UTF-8 to stdout/stderr, whatever the OS code page.
+
+    On Windows, piped output (which is how AI agents run these scripts)
+    defaults to a legacy code page such as cp1252 that cannot encode Polish
+    letters like "ł", so printing the JSON results would otherwise crash
+    with UnicodeEncodeError.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
+_use_utf8_stdio()
 
 USER_AGENT = (
     "polish-academic-skills/1.0 "
@@ -135,3 +154,34 @@ def build_query(params: Dict[str, Any]) -> str:
         else:
             pairs.append((key, str(value)))
     return urllib.parse.urlencode(pairs)
+
+
+SETTINGS_FILENAME = "polish-academic-skills.env"
+
+
+def get_setting(name: str) -> str:
+    """Return a credential/setting such as PBN_APP_ID, or "" if it is not set.
+
+    Looks in the environment first, then in a plain-text settings file named
+    polish-academic-skills.env (one KEY=value per line, "#" for comments) in
+    this skill's folder -- next to SKILL.md -- and then in the user's home
+    folder. The file exists for hosts where setting environment variables is
+    impractical, e.g. a skill uploaded to claude.ai or Claude Desktop.
+    """
+    value = os.environ.get(name, "").strip()
+    if value:
+        return value
+    skill_dir = Path(__file__).resolve().parent.parent
+    for path in (skill_dir / SETTINGS_FILENAME, Path.home() / SETTINGS_FILENAME):
+        try:
+            lines = path.read_text(encoding="utf-8-sig").splitlines()
+        except OSError:
+            continue
+        for line in lines:
+            key, sep, raw = line.strip().partition("=")
+            key = key.strip()
+            if key.startswith("export "):
+                key = key[len("export "):].strip()
+            if sep and key == name:
+                return raw.strip().strip("\"'").strip()
+    return ""

@@ -1,6 +1,8 @@
 ---
 name: polish-open-data-statistics
-description: Search and fetch Polish government open data and official regional statistics without an MCP server. Covers dane.gov.pl (dane otwarte, the national open data portal) and GUS's Bank Danych Lokalnych / BDL (statystyka publiczna, TERYT territorial units, województwa, wskaźniki statystyczne, demografia, ludność) -- BDL is the machine-readable API behind stat.gov.pl's own published figures. IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to both sources in parallel. Use for "open data Poland", "GUS statistics", "local data bank", "dane.gov.pl", "BDL", "stat.gov.pl", "statystyka regionalna".
+description: Search and fetch Polish government open data and official regional statistics without an MCP server. Covers dane.gov.pl (dane otwarte, the national open data portal) and GUS's Bank Danych Lokalnych / BDL (statystyka publiczna, TERYT territorial units, województwa, wskaźniki statystyczne, demografia, ludność) -- BDL is the machine-readable API behind stat.gov.pl's own published figures. IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first; it fans the query out to both sources in parallel. Use for "open data Poland", "GUS statistics", "local data bank", "dane.gov.pl", "BDL", "stat.gov.pl", "statystyka regionalna".
+license: MIT
+compatibility: Requires Python 3.9+ (standard library only, nothing to install) and outbound HTTPS access to api.dane.gov.pl, bdl.stat.gov.pl.
 ---
 
 # Polish Open Data & Statistics
@@ -16,6 +18,24 @@ runs with the Python 3 standard library (`urllib`, `json`, `argparse`).
 |---|---|---|
 | **dane.gov.pl** | Poland's national open data portal: 43,000+ datasets from 500+ public institutions (ministries, local government, agencies). No API key. | `https://api.dane.gov.pl/1.4` |
 | **BDL (Bank Danych Lokalnych)** | GUS (Statistics Poland) regional/national statistics database: subjects, variables, territorial units (TERYT), and time-series data values. Works anonymously; optional client id for higher rate limits. This is the machine-readable API behind the figures published on the main **stat.gov.pl** site -- there is no separate general-purpose API for stat.gov.pl itself. | `https://bdl.stat.gov.pl/api/v1` |
+
+## Running the scripts
+
+- Every `scripts/...` path in this file is relative to **this skill's own
+  folder** (the directory that contains this `SKILL.md`), not to the user's
+  project. Call a script by its full path, e.g.
+  `python3 /path/to/polish-open-data-statistics/scripts/search_all.py --query "..."`, or `cd` into the skill
+  folder first.
+- Use `python3` on macOS/Linux. On Windows use `python` (or `py -3`) when
+  `python3` is not found. Python 3.9+ and its standard library are all that
+  is needed -- do not `pip install` anything.
+- Results are UTF-8 JSON on stdout; errors go to stderr with a non-zero exit
+  code. Summarize results for the user in plain language (the key fields
+  plus a source link) instead of pasting raw JSON, unless they ask for it.
+- The scripts need internet access to `api.dane.gov.pl`, `bdl.stat.gov.pl`. If every call fails with a
+  network, proxy, or HTTP 403 error, outbound traffic is being blocked (for
+  example by the network-egress setting on claude.ai / Claude Desktop) --
+  tell the user which domains to allow instead of retrying.
 
 ## Search across every source at once
 
@@ -117,9 +137,12 @@ python3 scripts/bdl.py get-variable --id 72305
 
 ## Notes
 
-- **`BDL_CLIENT_ID` (optional env var).** BDL works anonymously out of the
-  box. If you have a client id, export it and `bdl.py` will automatically
-  send it as the `X-ClientId` header for higher rate limits:
+- **`BDL_CLIENT_ID` (optional).** BDL works anonymously out of the
+  box. If you have a client id, `bdl.py` automatically sends it as the
+  `X-ClientId` header for higher rate limits. Set it either as an
+  environment variable or as a `BDL_CLIENT_ID=your-client-id` line in a
+  plain-text `polish-academic-skills.env` file in this skill's folder (next
+  to this `SKILL.md`) or in the user's home folder:
 
   ```bash
   export BDL_CLIENT_ID="your-client-id"
