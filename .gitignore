@@ -1,3 +1,8 @@
 __pycache__/
 *.pyc
 .DS_Store
+# Local credentials for PBN/BDL (see README) -- never commit them
+polish-academic-skills.env
+# Skill ZIPs built by install.py --zip / the release workflow
+dist/
+polish-academic-skills-zips/

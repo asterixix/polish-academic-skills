@@ -43,6 +43,9 @@ covers it, no separate script is needed.
   network, proxy, or HTTP 403 error, outbound traffic is being blocked (for
   example by the network-egress setting on claude.ai / Claude Desktop) --
   tell the user which domains to allow instead of retrying.
+- On macOS, `CERTIFICATE_VERIFY_FAILED` means the python.org build of Python
+  has no CA certificates yet -- ask the user to run `Install Certificates.command`
+  from their `Applications/Python 3.x` folder once, then retry.
 
 ## Search across every source at once
 
