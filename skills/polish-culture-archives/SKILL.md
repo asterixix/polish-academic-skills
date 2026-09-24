@@ -1,6 +1,8 @@
 ---
 name: polish-culture-archives
-description: Query Polish cultural heritage, archives, and reference catalogs - Baza Legalnych Zrodel (legal digital-culture sources directory), BazTOL (technical-science web gateway, stale since 2022), NAC / Narodowe Archiwum Cyfrowe (National Digital Archive news + WordPress content), Katalog Biblioteki SUM (medical-university Aleph library catalog), PAUart (PAU fine-arts catalog), Wolne Lektury (free ebook library of Polish literature), Dokumenty Slaska (static historical-documents site), Centrum Informacji o Ofiarach II Wojny Swiatowej / IPN (WWII victims database), EDUKATOR (Pedagogical University of Krakow staff bibliography), Academica (Biblioteka Narodowa digital lending catalog), and Chmura Czytania (free classic-literature digital library). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to every free-text-searchable source in this skill in parallel. Use when the user asks about Polish cultural heritage, digital archives, archiwa cyfrowe, dziedzictwo kulturowe, legalne zrodla kultury, BazTOL, NAC, National Digital Archive, katalog biblioteczny Aleph, PAUart, dziela sztuki, Wolne Lektury, wolne lektury, free ebooks Polish literature, biblioteka cyfrowa, medieval Silesian documents, ofiary wojny, IPN, druga wojna swiatowa, bibliografia pracownikow uczelni, Academica, Biblioteka Narodowa, wypozyczalnia cyfrowa, or Chmura Czytania. No API keys needed for any of these sources.
+description: Search Polish cultural-heritage archives, libraries and catalogs -- Baza Legalnych Zrodel, BazTOL, NAC (Narodowe Archiwum Cyfrowe), Katalog Biblioteki SUM (Aleph), PAUart (PAU fine-arts catalog), Wolne Lektury (free Polish-literature ebooks), Dokumenty Slaska (medieval Silesian documents), the IPN WWII victims database (Centrum Informacji o Ofiarach II WS), EDUKATOR (UP Krakow staff bibliography), Academica (Biblioteka Narodowa digital lending) and Chmura Czytania. IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first; it queries every searchable source in parallel. Use for Polish cultural heritage, "dziedzictwo kulturowe", "archiwa cyfrowe", "biblioteka cyfrowa", "legalne zrodla kultury", artworks ("dziela sztuki"), free Polish ebooks, WWII victims ("ofiary wojny", IPN), library catalogs, or whenever the user names one of the sources above. No API keys needed.
+license: MIT
+compatibility: Requires Python 3.9+ (standard library only, nothing to install) and outbound HTTPS access to bazalegalnychzrodel.pl, baztol.library.put.poznan.pl, www.nac.gov.pl, katalog.sum.edu.pl, www.pauart.pl, wolnelektury.pl, www.dokumentyslaska.pl, ofiary.ipn.gov.pl, bgbase.up.krakow.pl, academica.edu.pl, www.chmuraczytania.pl.
 ---
 
 # Polish Culture Archives
@@ -30,6 +32,27 @@ was confirmed against the real server vs. best-effort).
 | **EDUKATOR** (bgbase.up.krakow.pl) | Staff/doctoral-student publication bibliography, Pedagogical University of Krakow | HTML (Expertus CGI, iso-8859-2) | Query confirmed working live (verified "no results" response); populated-results shape not yet confirmed |
 | **Academica** | Biblioteka Narodowa (National Library) digital inter-library lending catalog | HTML (JSF/RichFaces postback) | Multi-step session flow (ViewState + cookie) confirmed correct; result-page shape not yet confirmed. Copyrighted full text requires a library terminal -- catalog search only. |
 | **Chmura Czytania** | Free digital library of classic literature (Fundacja Festina Lente) | HTML (static PHP catalog) | No server-side search -- `search` pages through the catalog and filters client-side by title/author |
+
+## Running the scripts
+
+- Every `scripts/...` path in this file is relative to **this skill's own
+  folder** (the directory that contains this `SKILL.md`), not to the user's
+  project. Call a script by its full path, e.g.
+  `python3 /path/to/polish-culture-archives/scripts/search_all.py --query "..."`, or `cd` into the skill
+  folder first.
+- Use `python3` on macOS/Linux. On Windows use `python` (or `py -3`) when
+  `python3` is not found. Python 3.9+ and its standard library are all that
+  is needed -- do not `pip install` anything.
+- Results are UTF-8 JSON on stdout; errors go to stderr with a non-zero exit
+  code. Summarize results for the user in plain language (the key fields
+  plus a source link) instead of pasting raw JSON, unless they ask for it.
+- The scripts need internet access to `bazalegalnychzrodel.pl`, `baztol.library.put.poznan.pl`, `www.nac.gov.pl`, `katalog.sum.edu.pl`, `www.pauart.pl`, `wolnelektury.pl`, `www.dokumentyslaska.pl`, `ofiary.ipn.gov.pl`, `bgbase.up.krakow.pl`, `academica.edu.pl`, `www.chmuraczytania.pl`. If every call fails with a
+  network, proxy, or HTTP 403 error, outbound traffic is being blocked (for
+  example by the network-egress setting on claude.ai / Claude Desktop) --
+  tell the user which domains to allow instead of retrying.
+- On macOS, `CERTIFICATE_VERIFY_FAILED` means the python.org build of Python
+  has no CA certificates yet -- ask the user to run `Install Certificates.command`
+  from their `Applications/Python 3.x` folder once, then retry.
 
 ## Search across every source at once
 

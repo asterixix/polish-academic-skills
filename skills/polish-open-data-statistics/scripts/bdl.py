@@ -5,10 +5,11 @@ BDL web UI: https://bdl.stat.gov.pl/BDL/start
 REST API v1: https://bdl.stat.gov.pl/api/v1/
 OpenAPI spec: https://bdl.stat.gov.pl/api/v1/swagger/doc/swagger.json
 
-Anonymous access works. Optionally set the BDL_CLIENT_ID environment
-variable to send it as the X-ClientId header for higher rate limits
-(register a client id at https://api.stat.gov.pl/home/bdlapi). The skill
-works fine without it -- it's purely a rate-limit optimization.
+Anonymous access works. Optionally set BDL_CLIENT_ID (an environment
+variable, or a line in polish-academic-skills.env -- see _http.get_setting)
+to send it as the X-ClientId header for higher rate limits (register a
+client id at https://api.stat.gov.pl/home/bdlapi). The skill works fine
+without it -- it's purely a rate-limit optimization.
 
 Subcommands (mirroring the original MCP tools):
   search-subjects       (bdl_search_subjects)      -- thematic tree search by name fragment.
@@ -25,11 +26,10 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from typing import Any, Dict, List, Optional
 
-from _http import build_query, fetch_json
+from _http import build_query, fetch_json, get_setting
 
 API_BASE = "https://bdl.stat.gov.pl/api/v1"
 
@@ -41,7 +41,7 @@ def bdl_headers() -> Dict[str, str]:
     with a lower rate limit, so we never error out when it's absent.
     """
     headers: Dict[str, str] = {}
-    client_id = os.environ.get("BDL_CLIENT_ID", "").strip()
+    client_id = get_setting("BDL_CLIENT_ID")
     if client_id:
         headers["X-ClientId"] = client_id
     return headers

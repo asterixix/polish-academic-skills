@@ -1,6 +1,8 @@
 ---
 name: polish-science-bibliography
-description: Query Polish science-bureaucracy and bibliography data - publication and researcher records in PBN (Polska Bibliografia Naukowa), open higher-education/institution datasets from POL-on / RAD-on, and researcher profiles from Ludzie Nauki (ORCID, degrees, keywords) -- Ludzie Nauki is the successor to nauka-polska.pl, which now redirects here. IMPORTANT -- for any broad "find this publication or researcher" search, run `scripts/search_all.py --query X` first: it fans the query out to PBN and Ludzie Nauki in parallel. Use when the user asks about Polish scientific publications, PBN, POL-on, RAD-on, nauka-polska, uczelnie, pracownicy naukowi, granty/projekty naukowe, naukowcy, badacze, ORCID, publikacje naukowe, or scientist/institution lookups tied to Polish public science registries. PBN tools require registered API credentials; POL-on/RAD-on and Ludzie Nauki are open, no key needed.
+description: Query Polish science-bureaucracy and bibliography data - publication and researcher records in PBN (Polska Bibliografia Naukowa), open higher-education/institution datasets from POL-on / RAD-on, and researcher profiles from Ludzie Nauki (ORCID, degrees, keywords) -- Ludzie Nauki is the successor to nauka-polska.pl, which now redirects here. IMPORTANT -- for any broad "find this publication or researcher" search, run `scripts/search_all.py --query X` first; it fans the query out to PBN and Ludzie Nauki in parallel. Use when the user asks about Polish scientific publications, PBN, POL-on, RAD-on, nauka-polska, uczelnie, pracownicy naukowi, granty/projekty naukowe, naukowcy, badacze, ORCID, publikacje naukowe, or scientist/institution lookups tied to Polish public science registries. PBN tools require registered API credentials; POL-on/RAD-on and Ludzie Nauki are open, no key needed.
+license: MIT
+compatibility: Requires Python 3.9+ (standard library only, nothing to install) and outbound HTTPS access to pbn.nauka.gov.pl, radon.nauka.gov.pl, ludzie.nauka.gov.pl.
 ---
 
 # Polish Science Bibliography
@@ -23,6 +25,27 @@ No MCP server, no pip installs. Run the scripts directly with `python3`.
 **Note on nauka-polska.pl:** the historic Nauka Polska portal now redirects
 to `ludzie.nauka.gov.pl` and is archival-only -- `ludzie_nauki.py` already
 covers it, no separate script is needed.
+
+## Running the scripts
+
+- Every `scripts/...` path in this file is relative to **this skill's own
+  folder** (the directory that contains this `SKILL.md`), not to the user's
+  project. Call a script by its full path, e.g.
+  `python3 /path/to/polish-science-bibliography/scripts/search_all.py --query "..."`, or `cd` into the skill
+  folder first.
+- Use `python3` on macOS/Linux. On Windows use `python` (or `py -3`) when
+  `python3` is not found. Python 3.9+ and its standard library are all that
+  is needed -- do not `pip install` anything.
+- Results are UTF-8 JSON on stdout; errors go to stderr with a non-zero exit
+  code. Summarize results for the user in plain language (the key fields
+  plus a source link) instead of pasting raw JSON, unless they ask for it.
+- The scripts need internet access to `pbn.nauka.gov.pl`, `radon.nauka.gov.pl`, `ludzie.nauka.gov.pl`. If every call fails with a
+  network, proxy, or HTTP 403 error, outbound traffic is being blocked (for
+  example by the network-egress setting on claude.ai / Claude Desktop) --
+  tell the user which domains to allow instead of retrying.
+- On macOS, `CERTIFICATE_VERIFY_FAILED` means the python.org build of Python
+  has no CA certificates yet -- ask the user to run `Install Certificates.command`
+  from their `Applications/Python 3.x` folder once, then retry.
 
 ## Search across every source at once
 
@@ -63,24 +86,38 @@ PBN endpoints need institutional credentials, sent as headers `X-App-Id`
 and `X-App-Token` (matching the original TS server's `requirePbnHeaders`).
 An optional user-context header `X-User-Token` is added when present.
 
-Environment variables (read via `os.environ`, never hardcoded):
+Credentials (never hardcoded):
 
 - `PBN_APP_ID` (required)
 - `PBN_APP_TOKEN` (required)
 - `PBN_USER_TOKEN` (optional)
+
+Each is read from an environment variable of that name or, if unset, from
+a plain-text file named `polish-academic-skills.env` with `KEY=value` lines
+-- first in this skill's folder (next to this `SKILL.md`), then in the
+user's home folder. The file is the easy option for non-technical users and
+the only option where environment variables can't be set (a skill uploaded
+to claude.ai or Claude Desktop). If the user asks how to set up PBN, offer
+to create that file for them with the values they give you:
+
+```
+PBN_APP_ID=your-app-id
+PBN_APP_TOKEN=your-app-token
+```
 
 If `PBN_APP_ID` or `PBN_APP_TOKEN` is missing, the script prints a
 help message and **exits 1 before making any network call**:
 
 ```
 $ python3 scripts/pbn.py get-publication --id 5e70999e878c28a04737dd5f
-PBN API requires PBN_APP_ID and PBN_APP_TOKEN environment variables
-(optionally PBN_USER_TOKEN for user-context operations).
+PBN API requires PBN_APP_ID and PBN_APP_TOKEN (optionally PBN_USER_TOKEN for
+user-context operations), set as environment variables or as KEY=value lines
+in a polish-academic-skills.env file in this skill's folder or your home folder.
 Get access: https://pbn.nauka.gov.pl/centrum-pomocy/open-api-w-wersji-produkcyjnej-pbn/
 Details: https://pbn.nauka.gov.pl/centrum-pomocy/baza-wiedzy/sposob-uzyskania-dostepu-do-api-w-wersji-produkcyjnej/
 ```
 
-With credentials set:
+With credentials set (environment-variable form shown):
 
 ```bash
 export PBN_APP_ID="your-app-id"

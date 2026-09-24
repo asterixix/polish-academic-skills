@@ -27,6 +27,22 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+
+def _use_utf8_stdio() -> None:
+    """Always write UTF-8 to stdout/stderr, whatever the OS code page.
+
+    On Windows, piped output (which is how AI agents run these scripts)
+    defaults to a legacy code page such as cp1252 that cannot encode Polish
+    letters like "ł", so printing the JSON results would otherwise crash
+    with UnicodeEncodeError.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
+_use_utf8_stdio()
+
 USER_AGENT = "polish-academic-skills/1.0 (+https://github.com/asterixix/polish-academic-skills)"
 TIMEOUT_SECONDS = 30
 MAX_ATTEMPTS = 2  # one initial try + one retry on transient network errors

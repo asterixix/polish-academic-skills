@@ -1,0 +1,35 @@
+name: Release skill ZIPs
+
+# Pushing a tag such as v1.2.0 attaches one upload-ready ZIP per skill to the
+# GitHub release, so claude.ai / Claude Desktop users can download them from
+# https://github.com/asterixix/polish-academic-skills/releases/latest/download/<skill>.zip
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  zips:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: python -m pip install pyyaml && python tools/check_skills.py
+      - run: python install.py --zip dist
+      - uses: actions/upload-artifact@v6
+        with:
+          name: skill-zips
+          path: dist/*.zip
+      - name: Attach the ZIPs to the release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 \
+            || gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+          gh release upload "$GITHUB_REF_NAME" dist/*.zip --clobber

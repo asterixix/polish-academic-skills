@@ -1,6 +1,8 @@
 ---
 name: polish-educational-resources
 description: Search and browse free, Creative-Commons-licensed K-12 e-textbooks and learning materials from epodreczniki.pl (Zintegrowana Platforma Edukacyjna / ORE-MEN, Poland's Integrated Educational Platform). Use for "Polish e-textbooks", "podreczniki szkolne", "e-podreczniki", "materialy edukacyjne MEN", "otwarte zasoby edukacyjne", "ORE", "K-12 education Poland", "lekcje online". Not for university/academic-level sources -- see polish-academic-repositories and polish-science-bibliography for those. No API key needed.
+license: MIT
+compatibility: Requires Python 3.9+ (standard library only, nothing to install) and outbound HTTPS access to api.epodreczniki.pl, epodreczniki.pl.
 ---
 
 # Polish Educational Resources (epodreczniki.pl)
@@ -34,6 +36,27 @@ collections before guessing a `--path` for `browse`. If a `--search`/`--page`
 filter has no visible effect on a collection, that collection likely doesn't
 support it — try `--param KEY=VALUE` with a name you see in that collection's
 own JSON structure instead.
+
+## Running the scripts
+
+- Every `scripts/...` path in this file is relative to **this skill's own
+  folder** (the directory that contains this `SKILL.md`), not to the user's
+  project. Call a script by its full path, e.g.
+  `python3 /path/to/polish-educational-resources/scripts/epodreczniki.py root`, or `cd` into the skill
+  folder first.
+- Use `python3` on macOS/Linux. On Windows use `python` (or `py -3`) when
+  `python3` is not found. Python 3.9+ and its standard library are all that
+  is needed -- do not `pip install` anything.
+- Results are UTF-8 JSON on stdout; errors go to stderr with a non-zero exit
+  code. Summarize results for the user in plain language (the key fields
+  plus a source link) instead of pasting raw JSON, unless they ask for it.
+- The scripts need internet access to `api.epodreczniki.pl`, `epodreczniki.pl`. If every call fails with a
+  network, proxy, or HTTP 403 error, outbound traffic is being blocked (for
+  example by the network-egress setting on claude.ai / Claude Desktop) --
+  tell the user which domains to allow instead of retrying.
+- On macOS, `CERTIFICATE_VERIFY_FAILED` means the python.org build of Python
+  has no CA certificates yet -- ask the user to run `Install Certificates.command`
+  from their `Applications/Python 3.x` folder once, then retry.
 
 ## Scripts
 

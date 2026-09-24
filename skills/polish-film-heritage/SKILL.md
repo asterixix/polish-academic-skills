@@ -1,6 +1,8 @@
 ---
 name: polish-film-heritage
-description: Searches and fetches records from Polish film and photography heritage archives (mostly Filmoteka Narodowa / FINA sources) -- Ninateka VOD, Gapla poster gallery, Fototeka photo archive, FilmPolski.pl database, Fototeka Śląska (Silesian photo archive), and the FN digital repository. All HTML-scraped except Ninateka (JSON API). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first: it fans the query out to all six sources in parallel. Use for Polish film heritage, FINA, Filmoteka Narodowa, film posters, movie posters Poland, FilmPolski, polskie filmy, plakaty filmowe, fotosy filmowe, archiwum filmowe, historia kina polskiego, filmoteka, wyszukiwarka filmów.
+description: Searches and fetches records from Polish film and photography heritage archives (mostly Filmoteka Narodowa / FINA sources) -- Ninateka VOD, Gapla poster gallery, Fototeka photo archive, FilmPolski.pl database, Fototeka Śląska (Silesian photo archive), and the FN digital repository. All HTML-scraped except Ninateka (JSON API). IMPORTANT -- for any broad topic search, run `scripts/search_all.py --query X` first; it fans the query out to all six sources in parallel. Use for Polish film heritage, FINA, Filmoteka Narodowa, film posters, movie posters Poland, FilmPolski, polskie filmy, plakaty filmowe, fotosy filmowe, archiwum filmowe, historia kina polskiego, filmoteka, wyszukiwarka filmów.
+license: MIT
+compatibility: Requires Python 3.9+ (standard library only, nothing to install) and outbound HTTPS access to ninateka.pl, gapla.fn.org.pl, fototeka.fn.org.pl, www.filmpolski.pl, fototekaslaska.pl, repozytorium.fn.org.pl.
 ---
 
 # Polish Film Heritage
@@ -36,6 +38,27 @@ every script for those three always includes a capped `raw_html` field as
 a fallback so nothing is lost if the structured fields come back empty or
 wrong. See `reference/API.md` for exactly which parsing is a direct port
 vs. new best-effort heuristic, and why.
+
+## Running the scripts
+
+- Every `scripts/...` path in this file is relative to **this skill's own
+  folder** (the directory that contains this `SKILL.md`), not to the user's
+  project. Call a script by its full path, e.g.
+  `python3 /path/to/polish-film-heritage/scripts/search_all.py --query "..."`, or `cd` into the skill
+  folder first.
+- Use `python3` on macOS/Linux. On Windows use `python` (or `py -3`) when
+  `python3` is not found. Python 3.9+ and its standard library are all that
+  is needed -- do not `pip install` anything.
+- Results are UTF-8 JSON on stdout; errors go to stderr with a non-zero exit
+  code. Summarize results for the user in plain language (the key fields
+  plus a source link) instead of pasting raw JSON, unless they ask for it.
+- The scripts need internet access to `ninateka.pl`, `gapla.fn.org.pl`, `fototeka.fn.org.pl`, `www.filmpolski.pl`, `fototekaslaska.pl`, `repozytorium.fn.org.pl`. If every call fails with a
+  network, proxy, or HTTP 403 error, outbound traffic is being blocked (for
+  example by the network-egress setting on claude.ai / Claude Desktop) --
+  tell the user which domains to allow instead of retrying.
+- On macOS, `CERTIFICATE_VERIFY_FAILED` means the python.org build of Python
+  has no CA certificates yet -- ask the user to run `Install Certificates.command`
+  from their `Applications/Python 3.x` folder once, then retry.
 
 ## Search across every source at once
 

@@ -1,0 +1,32 @@
+name: Check skills
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.9", "3.13"]
+        exclude:
+          # Python 3.9 builds are not published for the arm64 macOS runners.
+          - os: macos-latest
+            python: "3.9"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      # PyYAML gives tools/check_skills.py the same strict frontmatter parse
+      # that claude.ai, Codex and Gemini CLI apply. The skills never need it.
+      - run: python -m pip install pyyaml
+      - run: python tools/check_skills.py
